@@ -34,7 +34,6 @@ export const calculateRemainingWorkEndDate = (order) => {
   const today = new Date();
   let daysToAdd = Math.ceil(remainingDays);
   let currentDate = new Date(today);
-  
   while (daysToAdd > 0) {
     currentDate.setDate(currentDate.getDate() + 1);
     
@@ -44,7 +43,8 @@ export const calculateRemainingWorkEndDate = (order) => {
       daysToAdd--;
     }
   }
-  
+    console.log(currentDate);
+
   return currentDate;
 };
 

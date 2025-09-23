@@ -25,7 +25,6 @@ export const OrdersList = () => {
     const remaining = order.cantidadEntrada - order.unidadesProducidas;
     return Number((remaining / order.promedioProduccion).toFixed(1));
   };
-
   const calculateProgress = (order) => {
     return Number(((order.unidadesProducidas / order.cantidadEntrada) * 100).toFixed(1));
   };
@@ -119,7 +118,6 @@ export const OrdersList = () => {
             const progress = calculateProgress(order);
             const remaining = order.cantidadEntrada - order.unidadesProducidas;
             const endDate = calculateRemainingWorkEndDate(order);
-
             return (
               <div
                 key={order.id}

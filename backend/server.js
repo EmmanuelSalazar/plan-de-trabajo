@@ -26,7 +26,7 @@ app.use(limiter);
 
 // CORS
 const corsOptions = {
-  origin: process.env.CORS_ORIGINS ? process.env.CORS_ORIGINS.split(',') : ['http://localhost:5173'],
+  origin: process.env.CORS_ORIGINS,
   credentials: true,
   optionsSuccessStatus: 200
 };
