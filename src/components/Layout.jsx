@@ -14,7 +14,7 @@ export const Layout = ({ children }) => {
             <div className="flex items-center space-x-2">
               <Factory className="w-8 h-8 text-blue-600" />
               <h1 className="text-xl font-bold text-gray-900">
-                Sistema de Producción
+                Planeación de producción
               </h1>
             </div>
             
