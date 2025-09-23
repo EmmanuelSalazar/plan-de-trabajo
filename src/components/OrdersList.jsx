@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { useProduction } from '../context/ProductionContext';
 import { ProductionModal } from './ProductionModal';
 import { HistoryModal } from './HistoryModal';
-import { Plus, History, Calendar, Package, Target, Clock, Users, CalendarDays } from 'lucide-react';
+import { Plus, History, Calendar, Package, Target, Clock, Users, CalendarDays, Filter } from 'lucide-react';
 import { formatDate, getRelativeDateString, calculateRemainingWorkEndDate } from '../utils/dateUtils';
 
 export const OrdersList = () => {
@@ -10,6 +10,12 @@ export const OrdersList = () => {
   const [productionModalOpen, setProductionModalOpen] = useState(false);
   const [historyModalOpen, setHistoryModalOpen] = useState(false);
   const [selectedOrder, setSelectedOrder] = useState(null);
+  const [selectedModule, setSelectedModule] = useState('all');
+
+  // Filter orders by module
+  const filteredOrders = selectedModule === 'all' 
+    ? orders 
+    : orders.filter(order => order.modulo === parseInt(selectedModule));
 
   const calculateWorkDays = (cantidadEntrada, promedioProduccion) => {
     return Number((cantidadEntrada / promedioProduccion).toFixed(1));
@@ -68,8 +74,28 @@ export const OrdersList = () => {
   return (
     <div>
       <div className="mb-6">
-        <h2 className="text-2xl font-bold text-gray-900">Órdenes de Producción</h2>
-        <p className="text-gray-600 mt-1">Gestiona y monitorea el progreso de las órdenes</p>
+        <div className="flex items-center justify-between">
+          <div>
+            <h2 className="text-2xl font-bold text-gray-900">Órdenes de Producción</h2>
+            <p className="text-gray-600 mt-1">Gestiona y monitorea el progreso de las órdenes</p>
+          </div>
+          
+          {/* Module Filter */}
+          <div className="flex items-center space-x-2">
+            <Filter className="w-5 h-5 text-gray-500" />
+            <select
+              value={selectedModule}
+              onChange={(e) => setSelectedModule(e.target.value)}
+              className="px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+            >
+              <option value="all">Todos los módulos</option>
+              <option value="1">Módulo 1</option>
+              <option value="2">Módulo 2</option>
+              <option value="3">Módulo 3</option>
+              <option value="4">Módulo 4</option>
+            </select>
+          </div>
+        </div>
       </div>
 
       {loading && (
@@ -79,7 +105,7 @@ export const OrdersList = () => {
         </div>
       )}
 
-      {!loading && orders.length === 0 ? (
+      {!loading && filteredOrders.length === 0 ? (
         <div className="text-center py-12">
           <Package className="w-16 h-16 text-gray-400 mx-auto mb-4" />
           <h3 className="text-lg font-medium text-gray-900 mb-2">No hay órdenes registradas</h3>
@@ -87,7 +113,7 @@ export const OrdersList = () => {
         </div>
       ) : (
         <div className="space-y-6">
-          {orders.map((order) => {
+          {filteredOrders.map((order) => {
             const workDays = calculateWorkDays(order.cantidadEntrada, order.promedioProduccion);
             const remainingDays = calculateRemainingDays(order);
             const progress = calculateProgress(order);

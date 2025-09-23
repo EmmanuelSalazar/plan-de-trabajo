@@ -41,7 +41,7 @@ const ProductionOrder = sequelize.define('production_orders', {
     allowNull: false,
     validate: {
       min: 1,
-      max: 3
+      max: 4
     }
   },
   unidadesProducidas: {

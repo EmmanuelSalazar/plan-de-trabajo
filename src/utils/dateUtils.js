@@ -3,7 +3,6 @@
 // Calculate work end date based on start date and work days
 export const calculateWorkEndDate = (startDate, workDays) => {
   const start = new Date(startDate);
-  const endDate = new Date(start);
   
   // Add work days (excluding weekends)
   let daysToAdd = Math.ceil(workDays);
@@ -31,7 +30,22 @@ export const calculateRemainingWorkEndDate = (order) => {
     return new Date(); // Already completed
   }
   
-  return calculateWorkEndDate(new Date(), remainingDays);
+  // Calculate from today, not from start date
+  const today = new Date();
+  let daysToAdd = Math.ceil(remainingDays);
+  let currentDate = new Date(today);
+  
+  while (daysToAdd > 0) {
+    currentDate.setDate(currentDate.getDate() + 1);
+    
+    // Skip weekends (Saturday = 6, Sunday = 0)
+    const dayOfWeek = currentDate.getDay();
+    if (dayOfWeek !== 0 && dayOfWeek !== 6) {
+      daysToAdd--;
+    }
+  }
+  
+  return currentDate;
 };
 
 // Format date for display

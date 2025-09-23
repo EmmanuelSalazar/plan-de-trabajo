@@ -139,9 +139,9 @@ const createOrder = async (req, res) => {
       });
     }
 
-    if (![1, 2, 3].includes(Number(modulo))) {
+    if (![1, 2, 3, 4].includes(Number(modulo))) {
       return res.status(400).json({ 
-        error: 'El módulo debe ser 1, 2 o 3' 
+        error: 'El módulo debe ser 1, 2, 3 o 4' 
       });
     }
 
