@@ -14,10 +14,10 @@
     "dialect": "mysql"
   },
   "production": {
-    "username": "root",
-    "password": null,
+    "username": "workplan",
+    "password": "",
     "database": "alt_workplan",
-    "host": "altconfecciones.local",
+    "host": "",
     "dialect": "mysql"
   }
 }
