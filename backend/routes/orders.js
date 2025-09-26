@@ -6,7 +6,8 @@ const {
   createOrder,
   updateOrder,
   deleteOrder,
-  addProduction
+  addProduction,
+  deleteProductionEntry
 } = require('../controllers/orderController');
 
 // Rutas de órdenes
@@ -18,5 +19,5 @@ router.delete('/:id', deleteOrder);
 
 // Ruta para agregar producción
 router.post('/:id/production', addProduction);
-
+router.delete('/production-entry/:id', deleteProductionEntry);
 module.exports = router;

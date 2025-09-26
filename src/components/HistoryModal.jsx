@@ -1,11 +1,20 @@
 import React from 'react';
-import { X, Calendar, Clock, Package } from 'lucide-react';
-
+import { X, Calendar, Clock, Package, Trash } from 'lucide-react';
+import { useProduction } from '../context/ProductionContext';
 export const HistoryModal = ({ isOpen, onClose, order }) => {
   if (!isOpen) return null;
-
-  const totalProduced = order.historialProduccion.reduce((sum, entry) => sum + entry.cantidad, 0);
-
+const totalProduced = order.historialProduccion.reduce((sum, entry) => sum + entry.cantidad, 0);
+const { deleteProductionEntry } = useProduction();
+const deleteEntry = async (entryId) => {
+  try {
+    await deleteProductionEntry(entryId);
+    onClose();
+    alert('Entrada de producción eliminada correctamente.');
+  } catch (error) {
+    console.error('Error deleting production entry:', error);
+    alert('Error al eliminar la entrada de producción. Por favor, inténtelo de nuevo.');
+  }
+}
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black bg-opacity-50">
       <div className="bg-white rounded-lg shadow-xl max-w-2xl w-full max-h-[80vh] overflow-hidden">
@@ -56,6 +65,7 @@ export const HistoryModal = ({ isOpen, onClose, order }) => {
                       key={entry.id}
                       className="flex items-center justify-between p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors"
                     >
+                    {console.log(entry)}
                       <div className="flex items-center space-x-3">
                         <div className="flex-shrink-0">
                           <div className="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center">
@@ -77,6 +87,12 @@ export const HistoryModal = ({ isOpen, onClose, order }) => {
                             </div>
                           </div>
                         </div>
+                      </div>
+                      <div>
+                        <button onClick={() => deleteEntry(entry.id)} className="flex items-center space-x-2 px-4 py-2 bg-red-100 text-red-700 rounded-md hover:bg-red-200 transition-colors">
+                          <Trash className="w-4 h-4 text-red-600" />
+                          <span className="text-red-600">Eliminar Entrada</span>
+                        </button>
                       </div>
                     </div>
                   ))}

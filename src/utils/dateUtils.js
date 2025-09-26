@@ -43,7 +43,6 @@ export const calculateRemainingWorkEndDate = (order) => {
       daysToAdd--;
     }
   }
-    console.log(currentDate);
 
   return currentDate;
 };

@@ -359,6 +359,30 @@ const addProduction = async (req, res) => {
     });
   }
 };
+// ELIMINAR ENTRADAS DE PRODUCCION
+const deleteProductionEntry = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    const entry = await ProductionEntry.findByPk(id);
+
+    if (!entry) {
+      return res.status(404).json({ error: 'Entrada de producción no encontrada' });
+    }
+
+    await entry.destroy();
+
+    res.json({ message: 'Entrada de producción eliminada exitosamente' });
+  } catch (error) {
+    console.error('Error deleting production entry:', error);
+    res.status(500).json({
+      error: 'Error interno del servidor',
+      message: error.message
+    });
+  }
+};
+
+
 
 module.exports = {
   getAllOrders,
@@ -366,5 +390,6 @@ module.exports = {
   createOrder,
   updateOrder,
   deleteOrder,
-  addProduction
+  addProduction,
+  deleteProductionEntry
 };

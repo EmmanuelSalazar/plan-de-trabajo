@@ -9,7 +9,7 @@ const apiRequest = async (endpoint, options = {}) => {
       'Content-Type': 'application/json',
       ...options.headers,
     },
-    ...options,
+    ...options, 
   };
 
   try {
@@ -55,6 +55,10 @@ export const productionOrdersAPI = {
   addProduction: (orderId, productionData) => apiRequest(`/orders/${orderId}/production`, {
     method: 'POST',
     body: JSON.stringify(productionData),
+  }),
+  // Delete production entry
+  deleteProductionEntry: (entryId) => apiRequest(`/orders/production-entry/${entryId}`, {
+    method: 'DELETE',
   }),
 };
 

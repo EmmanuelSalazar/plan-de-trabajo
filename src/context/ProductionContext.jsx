@@ -105,11 +105,11 @@ export const ProductionProvider = ({ children }) => {
       // Try to save to API first
       try {
         await productionOrdersAPI.addProduction(orderId, newEntry);
+        refreshOrders();
       } catch (apiError) {
         console.warn('API not available, saving locally:', apiError);
       }
-
-      // Update local state
+      /* ESTA FUNCION ESTÁ BAJO REVISION, POSIBLEMENTE SEA ELIMINADA // Update local state
       setOrders(prev => prev.map(order => {
         if (order.id === orderId) {
           const updatedOrder = {
@@ -128,7 +128,7 @@ export const ProductionProvider = ({ children }) => {
           return updatedOrder;
         }
         return order;
-      }));
+      })); */
     } catch (error) {
       setError(handleApiError(error));
       throw error;
@@ -136,6 +136,17 @@ export const ProductionProvider = ({ children }) => {
       setLoading(false);
     }
   };
+  const deleteProductionEntry = async (entryId) => {
+    setLoading(true);
+    setError(null);
+      try {
+        await productionOrdersAPI.deleteProductionEntry(entryId);
+        refreshOrders();
+      } catch (apiError) {
+        console.warn('API not available, deleting locally:', apiError);
+        throw apiError;
+      }
+    }
 
   const getOrderById = (id) => {
     return orders.find(order => order.id === id);
@@ -144,6 +155,17 @@ export const ProductionProvider = ({ children }) => {
   const refreshOrders = () => {
     loadOrders();
   };
+
+  const searchBar = (query) => {
+    if(query.length === 0) {
+      return loadOrders();
+    }
+    const filtered = orders.filter(order => 
+      order.ordenProduccion.toLowerCase().includes(query.toLowerCase())
+    );
+    setOrders(filtered);
+  }
+
 
   return (
     <ProductionContext.Provider value={{
@@ -154,6 +176,8 @@ export const ProductionProvider = ({ children }) => {
       addProduction,
       getOrderById,
       refreshOrders,
+      deleteProductionEntry,
+      searchBar
     }}>
       {children}
     </ProductionContext.Provider>
