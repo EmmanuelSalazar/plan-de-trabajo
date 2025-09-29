@@ -194,6 +194,7 @@ export const ProductionProvider = ({ children }) => {
       deleteProductionEntry,
       searchBar,
       updateOrder,
+      updateOrderSequence,
     }}>
       {children}
     </ProductionContext.Provider>

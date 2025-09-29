@@ -60,6 +60,12 @@ export const productionOrdersAPI = {
   deleteProductionEntry: (entryId) => apiRequest(`/orders/production-entry/${entryId}`, {
     method: 'DELETE',
   }),
+  
+  // Update order sequence
+  updateSequence: (orders) => apiRequest('/orders/sequence', {
+    method: 'PUT',
+    body: JSON.stringify({ orders }),
+  }),
 };
 
 // Utility function to handle API errors
