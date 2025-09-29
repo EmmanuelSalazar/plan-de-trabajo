@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { ClipboardList, Plus, Factory } from 'lucide-react';
+import { ClipboardList, Plus, Factory, Calendar } from 'lucide-react';
 
 export const Layout = ({ children }) => {
   const location = useLocation();
@@ -40,6 +40,17 @@ export const Layout = ({ children }) => {
               >
                 <ClipboardList className="w-4 h-4" />
                 <span>Lista de Órdenes</span>
+              </Link>
+              <Link
+                to="/planning"
+                className={`flex items-center space-x-2 px-3 py-2 rounded-md text-sm font-medium transition-colors ${
+                  location.pathname === '/planning'
+                    ? 'bg-blue-100 text-blue-700'
+                    : 'text-gray-600 hover:text-gray-900 hover:bg-gray-100'
+                }`}
+              >
+                <Calendar className="w-4 h-4" />
+                <span>Planificación</span>
               </Link>
             </nav>
           </div>

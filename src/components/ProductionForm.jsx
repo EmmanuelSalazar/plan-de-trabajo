@@ -15,6 +15,7 @@ export const ProductionForm = () => {
     promedioProduccion: '',
     cantidadEntrada: '',
     modulo: '',
+    materialesEnBodega: false,
   });
   
   const [errors, setErrors] = useState({});
@@ -74,6 +75,7 @@ export const ProductionForm = () => {
         promedioProduccion: Number(formData.promedioProduccion),
         cantidadEntrada: Number(formData.cantidadEntrada),
         modulo: Number(formData.modulo),
+        materialesEnBodega: formData.materialesEnBodega,
       });
 
       // Reset form
@@ -251,6 +253,27 @@ export const ProductionForm = () => {
                 </div>
               )}
             </div>
+          </div>
+
+          {/* Materiales en Bodega */}
+          <div className="flex items-center space-x-3 p-4 bg-green-50 rounded-lg border border-green-200">
+            <input
+              type="checkbox"
+              id="materialesEnBodega"
+              name="materialesEnBodega"
+              checked={formData.materialesEnBodega}
+              onChange={(e) => setFormData(prev => ({
+                ...prev,
+                materialesEnBodega: e.target.checked
+              }))}
+              className="w-4 h-4 text-green-600 bg-gray-100 border-gray-300 rounded focus:ring-green-500 focus:ring-2"
+            />
+            <label htmlFor="materialesEnBodega" className="text-sm font-medium text-green-800">
+              Materiales disponibles en bodega
+            </label>
+            <p className="text-xs text-green-600">
+              Marca esta casilla si todos los materiales están listos para producción
+            </p>
           </div>
 
           {/* Módulo */}

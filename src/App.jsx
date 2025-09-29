@@ -4,6 +4,7 @@ import { ProductionProvider } from './context/ProductionContext';
 import { Layout } from './components/Layout';
 import { FormPage } from './pages/FormPage';
 import { OrdersPage } from './pages/OrdersPage';
+import { PlanningPage } from './pages/PlanningPage';
 
 function App() {
   return (
@@ -13,6 +14,7 @@ function App() {
           <Routes>
             <Route path="/" element={<FormPage />} />
             <Route path="/orders" element={<OrdersPage />} />
+            <Route path="/planning" element={<PlanningPage />} />
           </Routes>
         </Layout>
       </Router>

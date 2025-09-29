@@ -419,5 +419,6 @@ module.exports = {
   updateOrder,
   deleteOrder,
   addProduction,
-  deleteProductionEntry
+  deleteProductionEntry,
+  updateOrderSequence
 };

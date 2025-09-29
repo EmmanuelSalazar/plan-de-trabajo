@@ -20,4 +20,7 @@ router.delete('/:id', deleteOrder);
 // Ruta para agregar producción
 router.post('/:id/production', addProduction);
 router.delete('/production-entry/:id', deleteProductionEntry);
+
+// Ruta para actualizar secuencia
+router.put('/sequence', updateOrderSequence);
 module.exports = router;

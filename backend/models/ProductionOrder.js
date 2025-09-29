@@ -58,6 +58,16 @@ const ProductionOrder = sequelize.define('production_orders', {
     type: DataTypes.DATE,
     allowNull: true,
     field: 'fecha_finalizacion'
+  },
+  materialesEnBodega: {
+    type: DataTypes.BOOLEAN,
+    defaultValue: false,
+    field: 'materiales_en_bodega'
+  },
+  sequenceOrder: {
+    type: DataTypes.INTEGER,
+    defaultValue: 0,
+    field: 'sequence_order'
   }
 }, {
   tableName: 'production_orders',
