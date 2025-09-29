@@ -89,6 +89,21 @@ export const ProductionProvider = ({ children }) => {
     }
   };
 
+  const updateOrder = async (orderId, orderData) => {
+    setLoading(true);
+    setError(null);
+    
+    try {
+      await productionOrdersAPI.update(orderId, orderData);
+      await loadOrders(); // Recargar órdenes para obtener datos actualizados
+    } catch (error) {
+      setError(handleApiError(error));
+      throw error;
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const addProduction = async (orderId, cantidad) => {
     setLoading(true);
     setError(null);
@@ -178,6 +193,7 @@ export const ProductionProvider = ({ children }) => {
       refreshOrders,
       deleteProductionEntry,
       searchBar
+      updateOrder,
     }}>
       {children}
     </ProductionContext.Provider>

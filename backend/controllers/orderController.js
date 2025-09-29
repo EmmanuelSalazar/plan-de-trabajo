@@ -217,16 +217,44 @@ const createOrder = async (req, res) => {
 // Actualizar orden
 const updateOrder = async (req, res) => {
   try {
+    console.log('📝 [UPDATE_ORDER] Iniciando actualización de orden...');
     const { id } = req.params;
     const updateData = req.body;
+    
+    console.log('📝 [UPDATE_ORDER] ID de orden:', id);
+    console.log('📝 [UPDATE_ORDER] Datos a actualizar:', updateData);
 
     const order = await ProductionOrder.findByPk(id);
     
     if (!order) {
+      console.log('❌ [UPDATE_ORDER] Orden no encontrada con ID:', id);
       return res.status(404).json({ error: 'Orden no encontrada' });
     }
 
+    // Validar que la nueva cantidad no sea menor a las unidades ya producidas
+    if (updateData.cantidadEntrada && updateData.cantidadEntrada < order.unidadesProducidas) {
+      console.log('❌ [UPDATE_ORDER] Cantidad menor a unidades producidas');
+      return res.status(400).json({ 
+        error: `La cantidad no puede ser menor a las unidades ya producidas (${order.unidadesProducidas})` 
+      });
+    }
+
+    // Si se actualiza la cantidad o promedio, recalcular fecha de finalización
+    if (updateData.cantidadEntrada || updateData.promedioProduccion) {
+      const cantidadTotal = updateData.cantidadEntrada || order.cantidadEntrada;
+      const promedio = updateData.promedioProduccion || order.promedioProduccion;
+      const remaining = cantidadTotal - order.unidadesProducidas;
+      
+      if (remaining > 0) {
+        const remainingDays = remaining / promedio;
+        const newEndDate = calculateWorkEndDate(new Date(), remainingDays);
+        updateData.fechaFinalizacion = newEndDate;
+        console.log('📅 [UPDATE_ORDER] Nueva fecha de finalización calculada:', newEndDate);
+      }
+    }
+
     await order.update(updateData);
+    console.log('✅ [UPDATE_ORDER] Orden actualizada correctamente');
 
     const updatedOrder = await ProductionOrder.findByPk(id, {
       include: [{

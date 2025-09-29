@@ -2,13 +2,15 @@ import React, { useState } from 'react';
 import { useProduction } from '../context/ProductionContext';
 import { ProductionModal } from './ProductionModal';
 import { HistoryModal } from './HistoryModal';
+import { EditOrderModal } from './EditOrderModal';
 import { Plus, History, Calendar, Package, Target, Clock, Users, CalendarDays, Filter, Search } from 'lucide-react';
 import { formatDate, getRelativeDateString, calculateRemainingWorkEndDate } from '../utils/dateUtils';
 
 export const OrdersList = () => {
-  const { orders, addProduction, loading, searchBar } = useProduction();
+  const { orders, addProduction, loading, deleteProductionEntry, updateProductionEntry, updateOrder } = useProduction();
   const [productionModalOpen, setProductionModalOpen] = useState(false);
   const [historyModalOpen, setHistoryModalOpen] = useState(false);
+  const [editOrderModalOpen, setEditOrderModalOpen] = useState(false);
   const [selectedOrder, setSelectedOrder] = useState(null);
   const [selectedModule, setSelectedModule] = useState('all');
 
@@ -39,12 +41,27 @@ export const OrdersList = () => {
     setHistoryModalOpen(true);
   };
 
+  const openEditOrderModal = (order) => {
+    setSelectedOrder(order);
+    setEditOrderModalOpen(true);
+  };
+
   const handleAddProduction = async (cantidad) => {
     if (selectedOrder) {
       try {
         await addProduction(selectedOrder.id, cantidad);
       } catch (error) {
         console.error('Error adding production:', error);
+      }
+    }
+  };
+
+  const handleUpdateOrder = async (orderData) => {
+    if (selectedOrder) {
+      try {
+        await updateOrder(selectedOrder.id, orderData);
+      } catch (error) {
+        console.error('Error updating order:', error);
       }
     }
   };
@@ -266,6 +283,13 @@ export const OrdersList = () => {
                       <History className="w-4 h-4" />
                       <span>Ver Historial</span>
                     </button>
+                    <button
+                      onClick={() => openEditOrderModal(order)}
+                      className="flex items-center space-x-2 px-4 py-2 bg-green-100 text-green-700 rounded-md hover:bg-green-200 transition-colors"
+                    >
+                      <Edit className="w-4 h-4" />
+                      <span>Editar Orden</span>
+                    </button>
                   </div>
                 </div>
               </div>
@@ -290,6 +314,13 @@ export const OrdersList = () => {
           />
         </>
       )}
+          <EditOrderModal
+            isOpen={editOrderModalOpen}
+            onClose={() => setEditOrderModalOpen(false)}
+            onSubmit={handleUpdateOrder}
+            order={selectedOrder}
+            loading={loading}
+          />
     </div>
   );
 };
