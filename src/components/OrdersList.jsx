@@ -3,7 +3,7 @@ import { useProduction } from '../context/ProductionContext';
 import { ProductionModal } from './ProductionModal';
 import { HistoryModal } from './HistoryModal';
 import { EditOrderModal } from './EditOrderModal';
-import { Plus, History, Calendar, Package, Target, Clock, Users, CalendarDays, Filter, Search, Edit, CheckCircle, AlertTriangle } from 'lucide-react';
+import { Plus, History, Calendar, Package, Target, Clock, Users, CalendarDays, Filter, Search, CreditCard as Edit, CheckCircle, AlertTriangle } from 'lucide-react';
 import { formatDate, getRelativeDateString, calculateRemainingWorkEndDate } from '../utils/dateUtils';
 
 export const OrdersList = () => {
@@ -163,19 +163,6 @@ export const OrdersList = () => {
                       <div className="flex items-center space-x-1 text-sm text-gray-500">
                         <Users className="w-4 h-4" />
                         <span>Módulo {order.modulo}</span>
-                      </div>
-                      <div className="flex items-center space-x-1">
-                        {order.materialesEnBodega ? (
-                          <div className="flex items-center space-x-1 text-green-600">
-                            <CheckCircle className="w-4 h-4" />
-                            <span className="text-xs">Materiales OK</span>
-                          </div>
-                        ) : (
-                          <div className="flex items-center space-x-1 text-orange-600">
-                            <AlertTriangle className="w-4 h-4" />
-                            <span className="text-xs">Sin materiales</span>
-                          </div>
-                        )}
                       </div>
                     </div>
                   </div>
