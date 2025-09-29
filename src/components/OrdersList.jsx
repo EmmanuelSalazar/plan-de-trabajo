@@ -3,7 +3,7 @@ import { useProduction } from '../context/ProductionContext';
 import { ProductionModal } from './ProductionModal';
 import { HistoryModal } from './HistoryModal';
 import { EditOrderModal } from './EditOrderModal';
-import { Plus, History, Calendar, Package, Target, Clock, Users, CalendarDays, Filter, Search } from 'lucide-react';
+import { Plus, History, Calendar, Package, Target, Clock, Users, CalendarDays, Filter, Search, Edit } from 'lucide-react';
 import { formatDate, getRelativeDateString, calculateRemainingWorkEndDate } from '../utils/dateUtils';
 
 export const OrdersList = () => {
