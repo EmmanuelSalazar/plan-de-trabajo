@@ -192,7 +192,7 @@ export const ProductionProvider = ({ children }) => {
       getOrderById,
       refreshOrders,
       deleteProductionEntry,
-      searchBar
+      searchBar,
       updateOrder,
     }}>
       {children}
