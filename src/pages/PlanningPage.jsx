@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { useProduction } from '../context/ProductionContext';
 import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
+import { StrictMode } from 'react';
 import { Calendar, Clock, Package, AlertTriangle, CheckCircle, GripVertical, Calculator, Filter } from 'lucide-react';
 import { formatDate, calculateWorkEndDate } from '../utils/dateUtils';
 
@@ -312,7 +313,7 @@ export const PlanningPage = () => {
           </h3>
           
           <DragDropContext onDragEnd={handleDragEnd}>
-            <Droppable droppableId="planning-timeline" type="ORDER">
+            <Droppable droppableId="planning-timeline">
               {(provided, snapshot) => (
                 <div 
                   {...provided.droppableProps} 
@@ -323,7 +324,7 @@ export const PlanningPage = () => {
                 >
                   {plannedOrders.map((order, index) => {
                     const progress = calculateProgress(order);
-                    const uniqueId = `order-${order.id}-${index}`;
+                    const uniqueId = `order-${order.id}`;
                     
                     return (
                       <Draggable 
