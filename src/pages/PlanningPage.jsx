@@ -260,7 +260,7 @@ export const PlanningPage = () => {
                     const progress = calculateProgress(order);
                     
                     return (
-                      <Draggable key={order.id} draggableId={order.id.toString()} index={index}>
+                      <Draggable key={`order-${order.id}`} draggableId={`order-${order.id}`} index={index}>
                         {(provided, snapshot) => (
                           <div
                             ref={provided.innerRef}
