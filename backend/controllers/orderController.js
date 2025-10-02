@@ -410,7 +410,7 @@ const deleteProductionEntry = async (req, res) => {
   }
 };
 
-
+const updateOrderSequence = "";
 
 module.exports = {
   getAllOrders,

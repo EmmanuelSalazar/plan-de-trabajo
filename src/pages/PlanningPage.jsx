@@ -1,20 +1,32 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { useProduction } from '../context/ProductionContext';
 import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
 import { Calendar, Clock, Package, AlertTriangle, CheckCircle, GripVertical, Calculator } from 'lucide-react';
 import { formatDate, calculateWorkEndDate } from '../utils/dateUtils';
 
 export const PlanningPage = () => {
-  const { orders, updateOrderSequence, loading } = useProduction();
+  const { orders, loading } = useProduction();
+
+  /* const orders = [{
+    id: '1',
+    materialesEnBodega: true,
+    cantidadEntrada: 100,
+    promedioProduccion: 10,
+    unidadesProducidas: 50,
+  }];
+  const loading = false; */
   const [plannedOrders, setPlannedOrders] = useState([]);
   const [totalWorkDays, setTotalWorkDays] = useState(0);
   const [finalEndDate, setFinalEndDate] = useState(null);
 
   // Filter orders that are ready for production and not completed
-  const readyOrders = orders.filter(order => 
-    order.materialesEnBodega && 
-    (order.unidadesProducidas / order.cantidadEntrada) < 1
-  );
+  const readyOrders = useMemo(() => {
+      // Vuelve a la lógica real del filtro.
+      return orders.filter(order => 
+         order.materialesEnBodega && 
+         (order.unidadesProducidas / order.cantidadEntrada) < 1
+      );
+   }, [orders]);
 
   useEffect(() => {
     calculateTimeline();

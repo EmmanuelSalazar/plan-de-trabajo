@@ -24,9 +24,9 @@ export const ProductionProvider = ({ children }) => {
   }, []);
 
   // Save to localStorage whenever orders change (fallback)
-  useEffect(() => {
+  /* useEffect(() => {
     localStorage.setItem('productionOrders', JSON.stringify(orders));
-  }, [orders]);
+  }, [orders]); */
 
   const loadOrders = async () => {
     setLoading(true);
@@ -124,26 +124,6 @@ export const ProductionProvider = ({ children }) => {
       } catch (apiError) {
         console.warn('API not available, saving locally:', apiError);
       }
-      /* ESTA FUNCION ESTÁ BAJO REVISION, POSIBLEMENTE SEA ELIMINADA // Update local state
-      setOrders(prev => prev.map(order => {
-        if (order.id === orderId) {
-          const updatedOrder = {
-            ...order,
-            unidadesProducidas: order.unidadesProducidas + cantidad,
-            historialProduccion: [...order.historialProduccion, newEntry],
-          };
-          
-          // Recalculate end date based on remaining work
-          const remaining = updatedOrder.cantidadEntrada - updatedOrder.unidadesProducidas;
-          if (remaining > 0) {
-            const remainingDays = remaining / updatedOrder.promedioProduccion;
-            updatedOrder.fechaFinalizacion = calculateWorkEndDate(new Date(), remainingDays).toISOString();
-          }
-          
-          return updatedOrder;
-        }
-        return order;
-      })); */
     } catch (error) {
       setError(handleApiError(error));
       throw error;
@@ -164,8 +144,8 @@ export const ProductionProvider = ({ children }) => {
     }
 
   const getOrderById = (id) => {
-    return orders.find(order => order.id === id);
-  };
+/*     return orders.find(order => order.id === id);
+ */  };
 
   const refreshOrders = () => {
     loadOrders();
@@ -194,7 +174,6 @@ export const ProductionProvider = ({ children }) => {
       deleteProductionEntry,
       searchBar,
       updateOrder,
-      updateOrderSequence,
     }}>
       {children}
     </ProductionContext.Provider>
