@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { useProduction } from '../context/ProductionContext';
 import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
-import { Calendar, Clock, Package, AlertTriangle, CheckCircle, GripVertical, Calculator } from 'lucide-react';
+import { Calendar, Clock, Package, AlertTriangle, CheckCircle, GripVertical, Calculator, Filter } from 'lucide-react';
 import { formatDate, calculateWorkEndDate } from '../utils/dateUtils';
 
 export const PlanningPage = () => {
@@ -9,11 +9,12 @@ export const PlanningPage = () => {
   const [plannedOrders, setPlannedOrders] = useState([]);
   const [totalWorkDays, setTotalWorkDays] = useState(0);
   const [finalEndDate, setFinalEndDate] = useState(null);
+  const [selectedModule, setSelectedModule] = useState('all');
 
   // Filter orders that are ready for production and not completed
   const readyOrders = useMemo(() => {
     console.log('🔍 [PLANNING] Todas las órdenes:', orders);
-    const filtered = orders.filter(order => {
+    let filtered = orders.filter(order => {
       const hasMaterieles = order.materialesEnBodega === true;
       const progress = (order.unidadesProducidas / order.cantidadEntrada) * 100;
       const notCompleted = progress < 100;
@@ -23,15 +24,22 @@ export const PlanningPage = () => {
         hasMaterieles,
         progress: progress.toFixed(1) + '%',
         notCompleted,
+        modulo: order.modulo,
         incluir: hasMaterieles && notCompleted
       });
       
       return hasMaterieles && notCompleted;
     });
+
+    // Filter by module if not 'all'
+    if (selectedModule !== 'all') {
+      filtered = filtered.filter(order => order.modulo === parseInt(selectedModule));
+      console.log(`🔍 [PLANNING] Filtrado por módulo ${selectedModule}:`, filtered.length);
+    }
     
     console.log('✅ [PLANNING] Órdenes listas para planificación:', filtered.length);
     return filtered;
-  }, [orders]);
+  }, [orders, selectedModule]);
 
   useEffect(() => {
     console.log('🔄 [PLANNING] Recalculando timeline...');
@@ -77,9 +85,7 @@ export const PlanningPage = () => {
         plannedEndDate: endDate,
         workDays,
         remaining,
-        sequenceOrder: index,
-        // Asegurar que el ID sea string
-        dragId: `order-${order.id}`
+        sequenceOrder: index
       };
     });
 
@@ -136,8 +142,7 @@ export const PlanningPage = () => {
         plannedEndDate: endDate,
         workDays,
         remaining,
-        sequenceOrder: index,
-        dragId: `order-${order.id}`
+        sequenceOrder: index
       };
     });
 
@@ -159,6 +164,22 @@ export const PlanningPage = () => {
     return Number(((order.unidadesProducidas / order.cantidadEntrada) * 100).toFixed(1));
   };
 
+  // Calculate module-specific stats
+  const moduleStats = useMemo(() => {
+    const moduleOrders = selectedModule === 'all' ? readyOrders : readyOrders.filter(o => o.modulo === parseInt(selectedModule));
+    const totalDays = moduleOrders.reduce((sum, order) => {
+      const remaining = order.cantidadEntrada - order.unidadesProducidas;
+      return sum + Math.ceil(remaining / order.promedioProduccion);
+    }, 0);
+    
+    return {
+      orders: moduleOrders.length,
+      totalDays,
+      startDate: plannedOrders.length > 0 ? plannedOrders[0]?.plannedStartDate : null,
+      endDate: plannedOrders.length > 0 ? plannedOrders[plannedOrders.length - 1]?.plannedEndDate : null
+    };
+  }, [readyOrders, selectedModule, plannedOrders]);
+
   if (loading) {
     return (
       <div className="text-center py-8">
@@ -172,8 +193,28 @@ export const PlanningPage = () => {
     <div className="space-y-6">
       {/* Header */}
       <div className="bg-white rounded-lg shadow-md p-6">
-        <h2 className="text-2xl font-bold text-gray-900 mb-2">Planificación de Producción</h2>
-        <p className="text-gray-600">Organiza el orden de las órdenes de producción y visualiza la línea de tiempo</p>
+        <div className="flex items-center justify-between">
+          <div>
+            <h2 className="text-2xl font-bold text-gray-900 mb-2">Planificación de Producción</h2>
+            <p className="text-gray-600">Organiza el orden de las órdenes de producción y visualiza la línea de tiempo</p>
+          </div>
+          
+          {/* Module Filter */}
+          <div className="flex items-center space-x-2">
+            <Filter className="w-5 h-5 text-gray-500" />
+            <select
+              value={selectedModule}
+              onChange={(e) => setSelectedModule(e.target.value)}
+              className="px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+            >
+              <option value="all">Todos los módulos</option>
+              <option value="1">Módulo 1</option>
+              <option value="2">Módulo 2</option>
+              <option value="3">Módulo 3</option>
+              <option value="4">Módulo 4</option>
+            </select>
+          </div>
+        </div>
       </div>
 
       {/* Summary Cards */}
@@ -182,8 +223,10 @@ export const PlanningPage = () => {
           <div className="flex items-center space-x-3">
             <Package className="w-8 h-8 text-blue-600" />
             <div>
-              <p className="text-sm text-blue-600 font-medium">Órdenes Listas</p>
-              <p className="text-2xl font-bold text-blue-900">{readyOrders.length}</p>
+              <p className="text-sm text-blue-600 font-medium">
+                {selectedModule === 'all' ? 'Órdenes Listas' : `Módulo ${selectedModule} - Órdenes`}
+              </p>
+              <p className="text-2xl font-bold text-blue-900">{moduleStats.orders}</p>
             </div>
           </div>
         </div>
@@ -193,7 +236,7 @@ export const PlanningPage = () => {
             <Calculator className="w-8 h-8 text-green-600" />
             <div>
               <p className="text-sm text-green-600 font-medium">Días Totales</p>
-              <p className="text-2xl font-bold text-green-900">{totalWorkDays}</p>
+              <p className="text-2xl font-bold text-green-900">{moduleStats.totalDays}</p>
             </div>
           </div>
         </div>
@@ -204,7 +247,7 @@ export const PlanningPage = () => {
             <div>
               <p className="text-sm text-purple-600 font-medium">Inicio</p>
               <p className="text-lg font-bold text-purple-900">
-                {plannedOrders.length > 0 ? plannedOrders[0].plannedStartDate.toLocaleDateString('es-ES') : 'N/A'}
+                {moduleStats.startDate ? moduleStats.startDate.toLocaleDateString('es-ES') : 'N/A'}
               </p>
             </div>
           </div>
@@ -216,7 +259,7 @@ export const PlanningPage = () => {
             <div>
               <p className="text-sm text-orange-600 font-medium">Finalización</p>
               <p className="text-lg font-bold text-orange-900">
-                {finalEndDate ? finalEndDate.toLocaleDateString('es-ES') : 'N/A'}
+                {moduleStats.endDate ? moduleStats.endDate.toLocaleDateString('es-ES') : 'N/A'}
               </p>
             </div>
           </div>
@@ -224,14 +267,14 @@ export const PlanningPage = () => {
       </div>
 
       {/* Orders not ready warning */}
-      {orders.filter(order => !order.materialesEnBodega).length > 0 && (
+      {orders.filter(order => !order.materialesEnBodega && (selectedModule === 'all' || order.modulo === parseInt(selectedModule))).length > 0 && (
         <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
           <div className="flex items-center space-x-2">
             <AlertTriangle className="w-5 h-5 text-yellow-600" />
             <p className="text-yellow-800">
               <span className="font-medium">
-                {orders.filter(order => !order.materialesEnBodega).length} órdenes
-              </span> no están listas para producción (materiales no disponibles)
+                {orders.filter(order => !order.materialesEnBodega && (selectedModule === 'all' || order.modulo === parseInt(selectedModule))).length} órdenes
+              </span> {selectedModule !== 'all' ? `del módulo ${selectedModule}` : ''} no están listas para producción (materiales no disponibles)
             </p>
           </div>
         </div>
@@ -239,11 +282,13 @@ export const PlanningPage = () => {
 
       {/* Debug Info */}
       <div className="bg-gray-50 border border-gray-200 rounded-lg p-4">
-        <h4 className="font-medium text-gray-900 mb-2">Debug Info:</h4>
+        <h4 className="font-medium text-gray-900 mb-2">
+          Debug Info {selectedModule !== 'all' ? `- Módulo ${selectedModule}` : ''}:
+        </h4>
         <div className="text-sm text-gray-600 space-y-1">
-          <p>Total órdenes: {orders.length}</p>
-          <p>Órdenes con materiales: {orders.filter(o => o.materialesEnBodega).length}</p>
-          <p>Órdenes incompletas: {orders.filter(o => (o.unidadesProducidas / o.cantidadEntrada) < 1).length}</p>
+          <p>Total órdenes: {selectedModule === 'all' ? orders.length : orders.filter(o => o.modulo === parseInt(selectedModule)).length}</p>
+          <p>Órdenes con materiales: {selectedModule === 'all' ? orders.filter(o => o.materialesEnBodega).length : orders.filter(o => o.materialesEnBodega && o.modulo === parseInt(selectedModule)).length}</p>
+          <p>Órdenes incompletas: {selectedModule === 'all' ? orders.filter(o => (o.unidadesProducidas / o.cantidadEntrada) < 1).length : orders.filter(o => (o.unidadesProducidas / o.cantidadEntrada) < 1 && o.modulo === parseInt(selectedModule)).length}</p>
           <p>Órdenes listas para planificación: {readyOrders.length}</p>
           <p>Órdenes en timeline: {plannedOrders.length}</p>
         </div>
@@ -253,17 +298,21 @@ export const PlanningPage = () => {
       {plannedOrders.length === 0 ? (
         <div className="bg-white rounded-lg shadow-md p-12 text-center">
           <Package className="w-16 h-16 text-gray-400 mx-auto mb-4" />
-          <h3 className="text-lg font-medium text-gray-900 mb-2">No hay órdenes listas para planificar</h3>
+          <h3 className="text-lg font-medium text-gray-900 mb-2">
+            No hay órdenes listas para planificar {selectedModule !== 'all' ? `en el módulo ${selectedModule}` : ''}
+          </h3>
           <p className="text-gray-500">
             Asegúrate de marcar las órdenes como "Materiales en Bodega" para incluirlas en la planificación
           </p>
         </div>
       ) : (
         <div className="bg-white rounded-lg shadow-md p-6">
-          <h3 className="text-lg font-semibold text-gray-900 mb-4">Línea de Tiempo de Producción</h3>
+          <h3 className="text-lg font-semibold text-gray-900 mb-4">
+            Línea de Tiempo de Producción {selectedModule !== 'all' ? `- Módulo ${selectedModule}` : ''}
+          </h3>
           
           <DragDropContext onDragEnd={handleDragEnd}>
-            <Droppable droppableId="planning-timeline">
+            <Droppable droppableId="planning-timeline" type="ORDER">
               {(provided, snapshot) => (
                 <div 
                   {...provided.droppableProps} 
@@ -274,11 +323,12 @@ export const PlanningPage = () => {
                 >
                   {plannedOrders.map((order, index) => {
                     const progress = calculateProgress(order);
+                    const uniqueId = `order-${order.id}-${index}`;
                     
                     return (
                       <Draggable 
-                        key={order.dragId} 
-                        draggableId={order.dragId} 
+                        key={uniqueId}
+                        draggableId={uniqueId}
                         index={index}
                       >
                         {(provided, snapshot) => (

@@ -111,15 +111,6 @@ export const OrdersList = () => {
               <option value="4">Módulo 4</option>
             </select>
           </div>
-          <div className="flex items-center space-x-2">
-            <Search className='w-5 h-5 text-gray-500'  />
-            <input 
-            className='px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"' 
-            type='text' 
-            placeholder='Buscar por orden' 
-            onChange={(e) => searchBar(e.target.value)}
-            />
-          </div>
           </div>
         </div>
       </div>
