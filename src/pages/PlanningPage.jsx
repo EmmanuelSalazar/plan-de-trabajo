@@ -5,7 +5,7 @@ import { Calendar, Clock, Package, AlertTriangle, CheckCircle, GripVertical, Cal
 import { formatDate, calculateWorkEndDate } from '../utils/dateUtils';
 
 export const PlanningPage = () => {
-  const { orders, loading, updateOrderSequence } = useProduction();
+  const { orders, loading } = useProduction();
   const [plannedOrders, setPlannedOrders] = useState([]);
   const [totalWorkDays, setTotalWorkDays] = useState(0);
   const [finalEndDate, setFinalEndDate] = useState(null);
@@ -77,7 +77,9 @@ export const PlanningPage = () => {
         plannedEndDate: endDate,
         workDays,
         remaining,
-        sequenceOrder: index
+        sequenceOrder: index,
+        // Asegurar que el ID sea string
+        dragId: `order-${order.id}`
       };
     });
 
@@ -93,8 +95,20 @@ export const PlanningPage = () => {
   };
 
   const handleDragEnd = (result) => {
-    if (!result.destination) return;
+    console.log('🎯 [DRAG] Drag result:', result);
+    
+    if (!result.destination) {
+      console.log('❌ [DRAG] No destination');
+      return;
+    }
 
+    if (result.source.index === result.destination.index) {
+      console.log('⚠️ [DRAG] Same position');
+      return;
+    }
+
+    console.log('🔄 [DRAG] Reordering items...');
+    
     const items = Array.from(plannedOrders);
     const [reorderedItem] = items.splice(result.source.index, 1);
     items.splice(result.destination.index, 0, reorderedItem);
@@ -122,21 +136,16 @@ export const PlanningPage = () => {
         plannedEndDate: endDate,
         workDays,
         remaining,
-        sequenceOrder: index
+        sequenceOrder: index,
+        dragId: `order-${order.id}`
       };
     });
 
+    console.log('✅ [DRAG] New order calculated');
+    
     setPlannedOrders(reorderedWithDates);
     setTotalWorkDays(totalDays);
     setFinalEndDate(reorderedWithDates[reorderedWithDates.length - 1]?.plannedEndDate);
-
-    // Update sequence in backend if function exists
-    if (updateOrderSequence) {
-      updateOrderSequence(reorderedWithDates.map(order => ({
-        id: order.id,
-        sequenceOrder: order.sequenceOrder
-      })));
-    }
   };
 
   const getProgressColor = (progress) => {
@@ -236,6 +245,7 @@ export const PlanningPage = () => {
           <p>Órdenes con materiales: {orders.filter(o => o.materialesEnBodega).length}</p>
           <p>Órdenes incompletas: {orders.filter(o => (o.unidadesProducidas / o.cantidadEntrada) < 1).length}</p>
           <p>Órdenes listas para planificación: {readyOrders.length}</p>
+          <p>Órdenes en timeline: {plannedOrders.length}</p>
         </div>
       </div>
 
@@ -253,27 +263,40 @@ export const PlanningPage = () => {
           <h3 className="text-lg font-semibold text-gray-900 mb-4">Línea de Tiempo de Producción</h3>
           
           <DragDropContext onDragEnd={handleDragEnd}>
-            <Droppable droppableId="timeline">
-              {(provided) => (
-                <div {...provided.droppableProps} ref={provided.innerRef} className="space-y-4">
+            <Droppable droppableId="planning-timeline">
+              {(provided, snapshot) => (
+                <div 
+                  {...provided.droppableProps} 
+                  ref={provided.innerRef} 
+                  className={`space-y-4 min-h-[200px] p-4 rounded-lg transition-colors ${
+                    snapshot.isDraggingOver ? 'bg-blue-50 border-2 border-blue-300 border-dashed' : 'bg-gray-50'
+                  }`}
+                >
                   {plannedOrders.map((order, index) => {
                     const progress = calculateProgress(order);
                     
                     return (
-                      <Draggable key={`order-${order.id}`} draggableId={`order-${order.id}`} index={index}>
+                      <Draggable 
+                        key={order.dragId} 
+                        draggableId={order.dragId} 
+                        index={index}
+                      >
                         {(provided, snapshot) => (
                           <div
                             ref={provided.innerRef}
                             {...provided.draggableProps}
-                            className={`border rounded-lg p-4 transition-all ${
+                            className={`border rounded-lg p-4 bg-white transition-all ${
                               snapshot.isDragging 
-                                ? 'shadow-lg bg-blue-50 border-blue-300' 
-                                : 'bg-gray-50 border-gray-200 hover:bg-gray-100'
+                                ? 'shadow-2xl bg-blue-50 border-blue-300 rotate-2 scale-105' 
+                                : 'shadow-sm border-gray-200 hover:shadow-md hover:border-gray-300'
                             }`}
                           >
                             <div className="flex items-center space-x-4">
                               {/* Drag Handle */}
-                              <div {...provided.dragHandleProps} className="cursor-grab active:cursor-grabbing">
+                              <div 
+                                {...provided.dragHandleProps} 
+                                className="cursor-grab active:cursor-grabbing hover:bg-gray-100 p-2 rounded"
+                              >
                                 <GripVertical className="w-5 h-5 text-gray-400" />
                               </div>
 
