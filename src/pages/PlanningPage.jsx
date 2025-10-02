@@ -5,35 +5,42 @@ import { Calendar, Clock, Package, AlertTriangle, CheckCircle, GripVertical, Cal
 import { formatDate, calculateWorkEndDate } from '../utils/dateUtils';
 
 export const PlanningPage = () => {
-  const { orders, loading } = useProduction();
-
-  /* const orders = [{
-    id: '1',
-    materialesEnBodega: true,
-    cantidadEntrada: 100,
-    promedioProduccion: 10,
-    unidadesProducidas: 50,
-  }];
-  const loading = false; */
+  const { orders, loading, updateOrderSequence } = useProduction();
   const [plannedOrders, setPlannedOrders] = useState([]);
   const [totalWorkDays, setTotalWorkDays] = useState(0);
   const [finalEndDate, setFinalEndDate] = useState(null);
 
   // Filter orders that are ready for production and not completed
   const readyOrders = useMemo(() => {
-      // Vuelve a la lógica real del filtro.
-      return orders.filter(order => 
-         order.materialesEnBodega && 
-         (order.unidadesProducidas / order.cantidadEntrada) < 1
-      );
-   }, [orders]);
+    console.log('🔍 [PLANNING] Todas las órdenes:', orders);
+    const filtered = orders.filter(order => {
+      const hasMaterieles = order.materialesEnBodega === true;
+      const progress = (order.unidadesProducidas / order.cantidadEntrada) * 100;
+      const notCompleted = progress < 100;
+      
+      console.log(`📋 [PLANNING] Orden ${order.ordenProduccion}:`, {
+        materialesEnBodega: order.materialesEnBodega,
+        hasMaterieles,
+        progress: progress.toFixed(1) + '%',
+        notCompleted,
+        incluir: hasMaterieles && notCompleted
+      });
+      
+      return hasMaterieles && notCompleted;
+    });
+    
+    console.log('✅ [PLANNING] Órdenes listas para planificación:', filtered.length);
+    return filtered;
+  }, [orders]);
 
   useEffect(() => {
+    console.log('🔄 [PLANNING] Recalculando timeline...');
     calculateTimeline();
   }, [readyOrders]);
 
   const calculateTimeline = () => {
     if (readyOrders.length === 0) {
+      console.log('⚠️ [PLANNING] No hay órdenes listas');
       setPlannedOrders([]);
       setTotalWorkDays(0);
       setFinalEndDate(null);
@@ -57,6 +64,13 @@ export const PlanningPage = () => {
       
       totalDays += workDays;
       
+      console.log(`📅 [PLANNING] Orden ${order.ordenProduccion}:`, {
+        remaining,
+        workDays,
+        startDate: startDate.toLocaleDateString(),
+        endDate: endDate.toLocaleDateString()
+      });
+      
       return {
         ...order,
         plannedStartDate: startDate,
@@ -65,6 +79,12 @@ export const PlanningPage = () => {
         remaining,
         sequenceOrder: index
       };
+    });
+
+    console.log('📊 [PLANNING] Timeline calculado:', {
+      totalOrders: ordersWithDates.length,
+      totalDays,
+      finalEndDate: ordersWithDates[ordersWithDates.length - 1]?.plannedEndDate
     });
 
     setPlannedOrders(ordersWithDates);
@@ -110,11 +130,13 @@ export const PlanningPage = () => {
     setTotalWorkDays(totalDays);
     setFinalEndDate(reorderedWithDates[reorderedWithDates.length - 1]?.plannedEndDate);
 
-    // Update sequence in backend
-    updateOrderSequence(reorderedWithDates.map(order => ({
-      id: order.id,
-      sequenceOrder: order.sequenceOrder
-    })));
+    // Update sequence in backend if function exists
+    if (updateOrderSequence) {
+      updateOrderSequence(reorderedWithDates.map(order => ({
+        id: order.id,
+        sequenceOrder: order.sequenceOrder
+      })));
+    }
   };
 
   const getProgressColor = (progress) => {
@@ -173,7 +195,7 @@ export const PlanningPage = () => {
             <div>
               <p className="text-sm text-purple-600 font-medium">Inicio</p>
               <p className="text-lg font-bold text-purple-900">
-                {plannedOrders.length > 0 ? formatDate(plannedOrders[0].plannedStartDate) : 'N/A'}
+                {plannedOrders.length > 0 ? plannedOrders[0].plannedStartDate.toLocaleDateString('es-ES') : 'N/A'}
               </p>
             </div>
           </div>
@@ -185,7 +207,7 @@ export const PlanningPage = () => {
             <div>
               <p className="text-sm text-orange-600 font-medium">Finalización</p>
               <p className="text-lg font-bold text-orange-900">
-                {finalEndDate ? formatDate(finalEndDate) : 'N/A'}
+                {finalEndDate ? finalEndDate.toLocaleDateString('es-ES') : 'N/A'}
               </p>
             </div>
           </div>
@@ -205,6 +227,17 @@ export const PlanningPage = () => {
           </div>
         </div>
       )}
+
+      {/* Debug Info */}
+      <div className="bg-gray-50 border border-gray-200 rounded-lg p-4">
+        <h4 className="font-medium text-gray-900 mb-2">Debug Info:</h4>
+        <div className="text-sm text-gray-600 space-y-1">
+          <p>Total órdenes: {orders.length}</p>
+          <p>Órdenes con materiales: {orders.filter(o => o.materialesEnBodega).length}</p>
+          <p>Órdenes incompletas: {orders.filter(o => (o.unidadesProducidas / o.cantidadEntrada) < 1).length}</p>
+          <p>Órdenes listas para planificación: {readyOrders.length}</p>
+        </div>
+      </div>
 
       {/* Timeline */}
       {plannedOrders.length === 0 ? (

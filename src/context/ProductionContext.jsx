@@ -94,9 +94,12 @@ export const ProductionProvider = ({ children }) => {
     setError(null);
     
     try {
+      console.log('📝 [CONTEXT] Actualizando orden:', orderId, orderData);
       await productionOrdersAPI.update(orderId, orderData);
       await loadOrders(); // Recargar órdenes para obtener datos actualizados
+      console.log('✅ [CONTEXT] Orden actualizada y datos recargados');
     } catch (error) {
+      console.error('❌ [CONTEXT] Error actualizando orden:', error);
       setError(handleApiError(error));
       throw error;
     } finally {

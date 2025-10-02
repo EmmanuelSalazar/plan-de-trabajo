@@ -160,6 +160,19 @@ export const OrdersList = () => {
                     </div>
                     <div className="flex items-center space-x-2">
                       {getStatusBadge(order)}
+                      <div className="flex items-center space-x-1 text-sm">
+                        {order.materialesEnBodega ? (
+                          <span className="px-2 py-1 text-xs rounded-full bg-green-100 text-green-800 flex items-center space-x-1">
+                            <span>✅</span>
+                            <span>Materiales OK</span>
+                          </span>
+                        ) : (
+                          <span className="px-2 py-1 text-xs rounded-full bg-yellow-100 text-yellow-800 flex items-center space-x-1">
+                            <span>⚠️</span>
+                            <span>Sin materiales</span>
+                          </span>
+                        )}
+                      </div>
                       <div className="flex items-center space-x-1 text-sm text-gray-500">
                         <Users className="w-4 h-4" />
                         <span>Módulo {order.modulo}</span>

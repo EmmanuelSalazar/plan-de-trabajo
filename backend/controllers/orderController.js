@@ -47,6 +47,7 @@ const getAllOrders = async (req, res) => {
       unidadesProducidas: order.unidadesProducidas,
       fechaCreacion: order.fechaCreacion,
       fechaFinalizacion: order.fechaFinalizacion,
+      materialesEnBodega: order.materialesEnBodega || false,
       historialProduccion: order.historialProduccion.map(entry => ({
         id: entry.id.toString(),
         cantidad: entry.cantidad,
@@ -94,6 +95,7 @@ const getOrderById = async (req, res) => {
       unidadesProducidas: order.unidadesProducidas,
       fechaCreacion: order.fechaCreacion,
       fechaFinalizacion: order.fechaFinalizacion,
+      materialesEnBodega: order.materialesEnBodega || false,
       historialProduccion: order.historialProduccion.map(entry => ({
         id: entry.id.toString(),
         cantidad: entry.cantidad,
@@ -194,6 +196,7 @@ const createOrder = async (req, res) => {
       unidadesProducidas: createdOrder.unidadesProducidas,
       fechaCreacion: createdOrder.fechaCreacion,
       fechaFinalizacion: createdOrder.fechaFinalizacion,
+      materialesEnBodega: createdOrder.materialesEnBodega || false,
       historialProduccion: []
     };
 
@@ -276,6 +279,7 @@ const updateOrder = async (req, res) => {
       unidadesProducidas: updatedOrder.unidadesProducidas,
       fechaCreacion: updatedOrder.fechaCreacion,
       fechaFinalizacion: updatedOrder.fechaFinalizacion,
+      materialesEnBodega: updatedOrder.materialesEnBodega || false,
       historialProduccion: updatedOrder.historialProduccion.map(entry => ({
         id: entry.id.toString(),
         cantidad: entry.cantidad,

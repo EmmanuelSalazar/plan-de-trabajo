@@ -256,7 +256,8 @@ export const ProductionForm = () => {
           </div>
 
           {/* Materiales en Bodega */}
-          <div className="flex items-center space-x-3 p-4 bg-green-50 rounded-lg border border-green-200">
+          <div className="p-4 bg-green-50 rounded-lg border border-green-200">
+            <div className="flex items-center space-x-3 mb-2">
             <input
               type="checkbox"
               id="materialesEnBodega"
@@ -271,6 +272,7 @@ export const ProductionForm = () => {
             <label htmlFor="materialesEnBodega" className="text-sm font-medium text-green-800">
               Materiales disponibles en bodega
             </label>
+            </div>
             <p className="text-xs text-green-600">
               Marca esta casilla si todos los materiales están listos para producción
             </p>
