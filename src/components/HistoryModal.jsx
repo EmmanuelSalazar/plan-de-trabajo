@@ -65,7 +65,6 @@ const deleteEntry = async (entryId) => {
                       key={entry.id}
                       className="flex items-center justify-between p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors"
                     >
-                    {console.log(entry)}
                       <div className="flex items-center space-x-3">
                         <div className="flex-shrink-0">
                           <div className="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center">
@@ -79,7 +78,7 @@ const deleteEntry = async (entryId) => {
                           <div className="flex items-center space-x-4 text-sm text-gray-500">
                             <div className="flex items-center space-x-1">
                               <Calendar className="w-4 h-4" />
-                              <span>{entry.fecha}</span>
+                              <span>{new Date(entry.fecha).toLocaleDateString('es-ES')}</span>
                             </div>
                             <div className="flex items-center space-x-1">
                               <Clock className="w-4 h-4" />

@@ -1,0 +1,11 @@
+{
+  "compilerOptions": {
+    "module": "commonjs",
+    "target": "es6"
+  },
+  "exclude": [
+    "node_modules", // Esto es CLAVE. Ignora todas las dependencias.
+    "dist",         // Ignora carpetas de compilación
+    "build"
+  ]
+}

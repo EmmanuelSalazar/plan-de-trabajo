@@ -4,7 +4,7 @@ import { ProductionModal } from './ProductionModal';
 import { HistoryModal } from './HistoryModal';
 import { EditOrderModal } from './EditOrderModal';
 import { Plus, History, Calendar, Package, Target, Clock, Users, CalendarDays, Filter, Search, CreditCard as Edit, CheckCircle, AlertTriangle } from 'lucide-react';
-import { formatDate, getRelativeDateString, calculateRemainingWorkEndDate } from '../utils/dateUtils';
+import { formatDate, getRelativeDateString, calculateRemainingWorkEndDate, getExplicitTime } from '../utils/dateUtils';
 
 export const OrdersList = () => {
   const { orders, addProduction, loading, deleteProductionEntry, updateProductionEntry, updateOrder } = useProduction();
@@ -136,6 +136,8 @@ export const OrdersList = () => {
             const progress = calculateProgress(order);
             const remaining = order.cantidadEntrada - order.unidadesProducidas;
             const endDate = calculateRemainingWorkEndDate(order);
+            const explicitTime = getExplicitTime(remainingDays);
+           console.log("Acabarás a la hora: " + explicitTime)
             return (
               <div
                 key={order.id}
@@ -160,7 +162,7 @@ export const OrdersList = () => {
                         ) : (
                           <span className="px-2 py-1 text-xs rounded-full bg-yellow-100 text-yellow-800 flex items-center space-x-1">
                             <span>⚠️</span>
-                            <span>Sin materiales</span>
+                            <span>Materiales incompletos</span>
                           </span>
                         )}
                       </div>
@@ -244,6 +246,11 @@ export const OrdersList = () => {
                         <div>
                           <p className="text-sm text-purple-700">
                             <span className="font-medium">Tiempo:</span> {getRelativeDateString(endDate)}
+                          </p>
+                        </div>
+                        <div>
+                          <p className="text-sm text-purple-700">
+                            <span className="font-medium">Hora:</span> {getExplicitTime(remainingDays)}
                           </p>
                         </div>
                       </div>

@@ -14,20 +14,19 @@ export const PlanningPage = () => {
 
   // Filter orders that are ready for production and not completed
   const readyOrders = useMemo(() => {
-    console.log('🔍 [PLANNING] Todas las órdenes:', orders);
     let filtered = orders.filter(order => {
       const hasMaterieles = order.materialesEnBodega === true;
       const progress = (order.unidadesProducidas / order.cantidadEntrada) * 100;
       const notCompleted = progress < 100;
       
-      console.log(`📋 [PLANNING] Orden ${order.ordenProduccion}:`, {
+      /* console.log(`📋 [PLANNING] Orden ${order.ordenProduccion}:`, {
         materialesEnBodega: order.materialesEnBodega,
         hasMaterieles,
         progress: progress.toFixed(1) + '%',
         notCompleted,
         modulo: order.modulo,
         incluir: hasMaterieles && notCompleted
-      });
+      }); */
       
       return hasMaterieles && notCompleted;
     });
@@ -35,21 +34,17 @@ export const PlanningPage = () => {
     // Filter by module if not 'all'
     if (selectedModule !== 'all') {
       filtered = filtered.filter(order => order.modulo === parseInt(selectedModule));
-      console.log(`🔍 [PLANNING] Filtrado por módulo ${selectedModule}:`, filtered.length);
     }
     
-    console.log('✅ [PLANNING] Órdenes listas para planificación:', filtered.length);
     return filtered;
   }, [orders, selectedModule]);
 
   useEffect(() => {
-    console.log('🔄 [PLANNING] Recalculando timeline...');
     calculateTimeline();
   }, [readyOrders]);
 
   const calculateTimeline = () => {
     if (readyOrders.length === 0) {
-      console.log('⚠️ [PLANNING] No hay órdenes listas');
       setPlannedOrders([]);
       setTotalWorkDays(0);
       setFinalEndDate(null);
@@ -73,12 +68,12 @@ export const PlanningPage = () => {
       
       totalDays += workDays;
       
-      console.log(`📅 [PLANNING] Orden ${order.ordenProduccion}:`, {
+      /* console.log(`📅 [PLANNING] Orden ${order.ordenProduccion}:`, {
         remaining,
         workDays,
         startDate: startDate.toLocaleDateString(),
         endDate: endDate.toLocaleDateString()
-      });
+      }); */
       
       return {
         ...order,
@@ -90,11 +85,11 @@ export const PlanningPage = () => {
       };
     });
 
-    console.log('📊 [PLANNING] Timeline calculado:', {
+    /* console.log('📊 [PLANNING] Timeline calculado:', {
       totalOrders: ordersWithDates.length,
       totalDays,
       finalEndDate: ordersWithDates[ordersWithDates.length - 1]?.plannedEndDate
-    });
+    }); */
 
     setPlannedOrders(ordersWithDates);
     setTotalWorkDays(totalDays);
@@ -102,20 +97,15 @@ export const PlanningPage = () => {
   };
 
   const handleDragEnd = (result) => {
-    console.log('🎯 [DRAG] Drag result:', result);
     
     if (!result.destination) {
-      console.log('❌ [DRAG] No destination');
       return;
     }
 
     if (result.source.index === result.destination.index) {
-      console.log('⚠️ [DRAG] Same position');
       return;
     }
 
-    console.log('🔄 [DRAG] Reordering items...');
-    
     const items = Array.from(plannedOrders);
     const [reorderedItem] = items.splice(result.source.index, 1);
     items.splice(result.destination.index, 0, reorderedItem);
@@ -147,7 +137,6 @@ export const PlanningPage = () => {
       };
     });
 
-    console.log('✅ [DRAG] New order calculated');
     
     setPlannedOrders(reorderedWithDates);
     setTotalWorkDays(totalDays);
@@ -282,7 +271,7 @@ export const PlanningPage = () => {
       )}
 
       {/* Debug Info */}
-      <div className="bg-gray-50 border border-gray-200 rounded-lg p-4">
+      {/* <div className="bg-gray-50 border border-gray-200 rounded-lg p-4">
         <h4 className="font-medium text-gray-900 mb-2">
           Debug Info {selectedModule !== 'all' ? `- Módulo ${selectedModule}` : ''}:
         </h4>
@@ -293,7 +282,7 @@ export const PlanningPage = () => {
           <p>Órdenes listas para planificación: {readyOrders.length}</p>
           <p>Órdenes en timeline: {plannedOrders.length}</p>
         </div>
-      </div>
+      </div> */}
 
       {/* Timeline */}
       {plannedOrders.length === 0 ? (

@@ -25,7 +25,7 @@ export const calculateWorkEndDate = (startDate, workDays) => {
 export const calculateRemainingWorkEndDate = (order) => {
   const remaining = order.cantidadEntrada - order.unidadesProducidas;
   const remainingDays = remaining / order.promedioProduccion;
-  
+
   if (remainingDays <= 0) {
     return new Date(); // Already completed
   }
@@ -43,7 +43,6 @@ export const calculateRemainingWorkEndDate = (order) => {
       daysToAdd--;
     }
   }
-
   return currentDate;
 };
 
@@ -76,3 +75,10 @@ export const getRelativeDateString = (date) => {
     return `Hace ${Math.abs(diffDays)} días`;
   }
 };
+export const getExplicitTime = (date) => {
+  const remainingDaysSplited = date.toString().split('.');
+  const dateHours = Number(( 6 + (9.2833 * (date - remainingDaysSplited[0]))).toFixed(2));
+  const remainingHoursSplited = dateHours.toString().split('.');
+  const dateMinutes = Math.round(Number(( dateHours - remainingHoursSplited[0]) * 60));
+  return remainingHoursSplited[0] + ":" + dateMinutes
+}
