@@ -1,4 +1,4 @@
-const { ProductionOrder, ProductionEntry } = require('../models');
+const { ProductionOrder, ProductionEntry, ColorSizeBreakdown } = require('../models');
 const { Op } = require('sequelize');
 
 // Función auxiliar para calcular fecha de finalización
@@ -30,6 +30,9 @@ const getAllOrders = async (req, res) => {
         model: ProductionEntry,
         as: 'historialProduccion',
         order: [['created_at', 'DESC']]
+      }, {
+        model: ColorSizeBreakdown,
+        as: 'colorBreakdowns'
       }],
       order: [['created_at', 'DESC']]
     });
@@ -311,6 +314,11 @@ const deleteOrder = async (req, res) => {
 
     // Eliminar entradas de producción relacionadas
     await ProductionEntry.destroy({
+      where: { orderId: id }
+    });
+
+    // Eliminar breakdowns de colores relacionados
+    await ColorSizeBreakdown.destroy({
       where: { orderId: id }
     });
 

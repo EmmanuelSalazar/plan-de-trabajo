@@ -1,6 +1,7 @@
 const sequelize = require('../config/database');
 const ProductionOrder = require('./ProductionOrder');
 const ProductionEntry = require('./ProductionEntry');
+const ColorSizeBreakdown = require('./ColorSizeBreakdown');
 
 // Definir relaciones
 ProductionOrder.hasMany(ProductionEntry, {
@@ -13,8 +14,19 @@ ProductionEntry.belongsTo(ProductionOrder, {
   as: 'order'
 });
 
+ProductionOrder.hasMany(ColorSizeBreakdown, {
+  foreignKey: 'orderId',
+  as: 'colorBreakdowns'
+});
+
+ColorSizeBreakdown.belongsTo(ProductionOrder, {
+  foreignKey: 'orderId',
+  as: 'order'
+});
+
 module.exports = {
   sequelize,
   ProductionOrder,
-  ProductionEntry
+  ProductionEntry,
+  ColorSizeBreakdown
 };

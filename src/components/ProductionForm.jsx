@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useProduction } from '../context/ProductionContext';
-import { Save, AlertCircle, Loader2 } from 'lucide-react';
+import { Save, AlertCircle, Loader2, Plus, X } from 'lucide-react';
 
 export const ProductionForm = () => {
   const navigate = useNavigate();
