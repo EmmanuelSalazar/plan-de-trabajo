@@ -19,6 +19,21 @@ export const ProductionForm = () => {
   });
   
   const [errors, setErrors] = useState({});
+  const [colorBreakdowns, setColorBreakdowns] = useState([
+    {
+      color: '',
+      size32: 0,
+      size34: 0,
+      size36: 0,
+      size38: 0,
+      size40: 0,
+      size42: 0,
+      totalUnits: 0
+    }
+  ]);
+
+  // Calcular total de unidades del desglose
+  const totalBreakdownUnits = colorBreakdowns.reduce((total, breakdown) => total + breakdown.totalUnits, 0);
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -34,6 +49,46 @@ export const ProductionForm = () => {
         [name]: ''
       }));
     }
+  };
+
+  // Funciones para manejar el desglose de colores
+  const addColorBreakdown = () => {
+    setColorBreakdowns(prev => [...prev, {
+      color: '',
+      size32: 0,
+      size34: 0,
+      size36: 0,
+      size38: 0,
+      size40: 0,
+      size42: 0,
+      totalUnits: 0
+    }]);
+  };
+
+  const removeColorBreakdown = (index) => {
+    if (colorBreakdowns.length > 1) {
+      setColorBreakdowns(prev => prev.filter((_, i) => i !== index));
+    }
+  };
+
+  const updateColorBreakdown = (index, field, value) => {
+    setColorBreakdowns(prev => {
+      const updated = [...prev];
+      updated[index] = { ...updated[index], [field]: value };
+      
+      // Recalcular total para este color
+      if (field !== 'color') {
+        updated[index].totalUnits = 
+          updated[index].size32 + 
+          updated[index].size34 + 
+          updated[index].size36 + 
+          updated[index].size38 + 
+          updated[index].size40 + 
+          updated[index].size42;
+      }
+      
+      return updated;
+    });
   };
 
   const validateForm = () => {
@@ -76,6 +131,7 @@ export const ProductionForm = () => {
         cantidadEntrada: Number(formData.cantidadEntrada),
         modulo: Number(formData.modulo),
         materialesEnBodega: formData.materialesEnBodega,
+        colorBreakdowns: colorBreakdowns.filter(breakdown => breakdown.color.trim() !== '')
       });
 
       // Reset form
@@ -87,7 +143,20 @@ export const ProductionForm = () => {
         promedioProduccion: '',
         cantidadEntrada: '',
         modulo: '',
+        materialesEnBodega: false,
       });
+      
+      // Reset color breakdowns
+      setColorBreakdowns([{
+        color: '',
+        size32: 0,
+        size34: 0,
+        size36: 0,
+        size38: 0,
+        size40: 0,
+        size42: 0,
+        totalUnits: 0
+      }]);
 
       // Navigate to orders list
       navigate('/orders');
@@ -303,6 +372,99 @@ export const ProductionForm = () => {
                 <span className="text-sm text-red-500">{errors.modulo}</span>
               </div>
             )}
+          </div>
+
+          {/* Desglose por Colores y Tallas */}
+          <div className="col-span-full">
+            <div className="border border-gray-300 rounded-lg p-6 bg-gray-50">
+              <div className="flex items-center justify-between mb-4">
+                <h3 className="text-lg font-medium text-gray-900">Desglose por Colores y Tallas</h3>
+                <button
+                  type="button"
+                  onClick={addColorBreakdown}
+                  className="flex items-center space-x-2 px-3 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors"
+                >
+                  <Plus className="w-4 h-4" />
+                  <span>Agregar Color</span>
+                </button>
+              </div>
+
+              <div className="space-y-4">
+                {colorBreakdowns.map((breakdown, index) => (
+                  <div key={index} className="bg-white border border-gray-200 rounded-lg p-4">
+                    <div className="flex items-center justify-between mb-4">
+                      <div className="flex-1 max-w-xs">
+                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                          Color
+                        </label>
+                        <input
+                          type="text"
+                          value={breakdown.color}
+                          onChange={(e) => updateColorBreakdown(index, 'color', e.target.value)}
+                          placeholder="ej: Blanco, Negro, Azul"
+                          className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        />
+                      </div>
+                      {colorBreakdowns.length > 1 && (
+                        <button
+                          type="button"
+                          onClick={() => removeColorBreakdown(index)}
+                          className="ml-4 p-2 text-red-600 hover:bg-red-50 rounded-md transition-colors"
+                        >
+                          <X className="w-5 h-5" />
+                        </button>
+                      )}
+                    </div>
+
+                    <div className="grid grid-cols-3 md:grid-cols-6 gap-4 mb-3">
+                      {[
+                        { key: 'size32', label: '32' },
+                        { key: 'size34', label: '34' },
+                        { key: 'size36', label: '36' },
+                        { key: 'size38', label: '38' },
+                        { key: 'size40', label: '40' },
+                        { key: 'size42', label: '42' }
+                      ].map(({ key, label }) => (
+                        <div key={key}>
+                          <label className="block text-xs font-medium text-gray-600 mb-1 text-center">
+                            Talla {label}
+                          </label>
+                          <input
+                            type="number"
+                            value={breakdown[key]}
+                            onChange={(e) => updateColorBreakdown(index, key, parseInt(e.target.value) || 0)}
+                            min="0"
+                            className="w-full px-2 py-1 text-sm border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 text-center"
+                          />
+                        </div>
+                      ))}
+                    </div>
+
+                    <div className="text-right">
+                      <span className="text-sm text-gray-600">
+                        Total del color: <span className="font-medium text-gray-900">{breakdown.totalUnits}</span>
+                      </span>
+                    </div>
+                  </div>
+                ))}
+              </div>
+
+              {/* Resumen Total */}
+              <div className="mt-4 p-4 bg-blue-50 rounded-lg border border-blue-200">
+                <div className="flex justify-between items-center">
+                  <span className="text-sm font-medium text-blue-900">Total de todas las tallas y colores:</span>
+                  <span className="text-lg font-bold text-blue-900">{totalBreakdownUnits}</span>
+                </div>
+                {formData.cantidadEntrada && totalBreakdownUnits !== parseInt(formData.cantidadEntrada) && (
+                  <div className="mt-2 flex items-center space-x-2 text-amber-700">
+                    <AlertCircle className="w-4 h-4" />
+                    <span className="text-sm">
+                      El total del desglose ({totalBreakdownUnits}) no coincide con la cantidad de entrada ({formData.cantidadEntrada})
+                    </span>
+                  </div>
+                )}
+              </div>
+            </div>
           </div>
 
           {/* Submit Button */}

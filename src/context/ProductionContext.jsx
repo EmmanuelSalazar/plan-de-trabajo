@@ -70,6 +70,7 @@ export const ProductionProvider = ({ children }) => {
         historialProduccion: [],
         fechaCreacion: new Date().toISOString(),
         fechaFinalizacion: fechaFinalizacion.toISOString(),
+        colorBreakdowns: orderData.colorBreakdowns || []
       });
 
       // Try to save to API first
