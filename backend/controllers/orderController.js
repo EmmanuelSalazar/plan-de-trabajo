@@ -79,6 +79,9 @@ const getOrderById = async (req, res) => {
         model: ProductionEntry,
         as: 'historialProduccion',
         order: [['created_at', 'DESC']]
+      }, {
+        model: ColorSizeBreakdown,
+        as: 'colorBreakdowns'
       }]
     });
 
@@ -288,18 +291,7 @@ const updateOrder = async (req, res) => {
         cantidad: entry.cantidad,
         fecha: entry.fecha,
         hora: entry.hora
-      })),
-      colorBreakdowns: updatedOrder.colorBreakdowns ? updatedOrder.colorBreakdowns.map(breakdown => ({
-        id: breakdown.id.toString(),
-        color: breakdown.color,
-        size32: breakdown.size32,
-        size34: breakdown.size34,
-        size36: breakdown.size36,
-        size38: breakdown.size38,
-        size40: breakdown.size40,
-        size42: breakdown.size42,
-        totalUnits: breakdown.totalUnits
-      })) : []
+      }))
     };
 
     res.json(formattedOrder);
