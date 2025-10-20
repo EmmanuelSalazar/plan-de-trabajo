@@ -214,7 +214,7 @@ export const PlanningPage = () => {
             <Package className="w-8 h-8 text-blue-600" />
             <div>
               <p className="text-sm text-blue-600 font-medium">
-                {selectedModule === 'all' ? 'Órdenes Listas' : `Módulo ${selectedModule} - Órdenes`}
+                {selectedModule === 'all' ? 'Órdenes En Proceso o Preparadas' : `Módulo ${selectedModule} - Órdenes`}
               </p>
               <p className="text-2xl font-bold text-blue-900">{moduleStats.orders}</p>
             </div>
@@ -225,7 +225,7 @@ export const PlanningPage = () => {
           <div className="flex items-center space-x-3">
             <Calculator className="w-8 h-8 text-green-600" />
             <div>
-              <p className="text-sm text-green-600 font-medium">Días Totales</p>
+              <p className="text-sm text-green-600 font-medium">Días Totales de trabajo</p>
               <p className="text-2xl font-bold text-green-900">{moduleStats.totalDays}</p>
             </div>
           </div>

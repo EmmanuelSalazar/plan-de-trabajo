@@ -3,7 +3,7 @@ import { useProduction } from '../context/ProductionContext';
 import { ProductionModal } from './ProductionModal';
 import { HistoryModal } from './HistoryModal';
 import { EditOrderModal } from './EditOrderModal';
-import { Plus, History, Calendar, Package, Target, Clock, Users, CalendarDays, Filter, Search, CreditCard as Edit, CheckCircle, AlertTriangle } from 'lucide-react';
+import { Plus, History, Calendar, Package, Target, PackageX, Users, CalendarDays, Filter, Search, CreditCard as Edit, CheckCircle, AlertTriangle } from 'lucide-react';
 import { formatDate, getRelativeDateString, calculateRemainingWorkEndDate, getExplicitTime } from '../utils/dateUtils';
 
 export const OrdersList = () => {
@@ -137,7 +137,6 @@ export const OrdersList = () => {
             const remaining = order.cantidadEntrada - order.unidadesProducidas;
             const endDate = calculateRemainingWorkEndDate(order);
             const explicitTime = getExplicitTime(remainingDays);
-           console.log("Acabarás a la hora: " + explicitTime)
             return (
               <div
                 key={order.id}
@@ -146,10 +145,10 @@ export const OrdersList = () => {
                 <div className="p-6">
                   <div className="flex items-start justify-between mb-4">
                     <div>
-                      <h3 className="text-xl font-semibold text-gray-900">
-                        {order.ordenProduccion}
-                      </h3>
-                      <p className="text-gray-600">{order.referencia} - {order.color}</p>
+                      <div className="d-flex text-xl">
+                        Orden de producción: <strong className="text-gray-900">{order.ordenProduccion}</strong>
+                      </div>
+                      <p className="text-gray-600">Referencia: <strong>{order.referencia}</strong> - Color: <strong>{order.color}</strong></p>
                     </div>
                     <div className="flex items-center space-x-2">
                       {getStatusBadge(order)}
@@ -202,7 +201,7 @@ export const OrdersList = () => {
                     <div className="bg-blue-50 p-3 rounded-lg">
                       <div className="flex items-center space-x-2 mb-1">
                         <Target className="w-4 h-4 text-blue-500" />
-                        <span className="text-xs text-gray-600">Cantidad Total</span>
+                        <span className="text-xs text-gray-600">Unidades totales de la <strong>OP</strong></span>
                       </div>
                       <p className="text-sm font-medium text-gray-900">
                         {order.cantidadEntrada.toLocaleString()}
@@ -212,7 +211,7 @@ export const OrdersList = () => {
                     <div className="bg-green-50 p-3 rounded-lg">
                       <div className="flex items-center space-x-2 mb-1">
                         <Package className="w-4 h-4 text-green-500" />
-                        <span className="text-xs text-gray-600">Producido</span>
+                        <span className="text-xs text-gray-600">Unidades producidas</span>
                       </div>
                       <p className="text-sm font-medium text-gray-900">
                         {order.unidadesProducidas.toLocaleString()}
@@ -221,11 +220,11 @@ export const OrdersList = () => {
 
                     <div className="bg-yellow-50 p-3 rounded-lg">
                       <div className="flex items-center space-x-2 mb-1">
-                        <Clock className="w-4 h-4 text-yellow-500" />
-                        <span className="text-xs text-gray-600">Días Restantes</span>
+                        <PackageX className="w-4 h-4 text-yellow-500" />
+                        <span className="text-xs text-gray-600">Unidades restantes por producir</span>
                       </div>
                       <p className="text-sm font-medium text-gray-900">
-                        {remainingDays > 0 ? remainingDays : 0}
+                        {remaining.toLocaleString()}
                       </p>
                     </div>
                   </div>
@@ -235,7 +234,7 @@ export const OrdersList = () => {
                     <div className="mb-6 p-4 bg-purple-50 rounded-lg border border-purple-200">
                       <div className="flex items-center space-x-2 mb-2">
                         <CalendarDays className="w-5 h-5 text-purple-600" />
-                        <h4 className="font-medium text-purple-900">Fecha Estimada de Finalización</h4>
+                        <h4 className="font-medium text-purple-900">Fecha Estimada de Finalización</h4><span>(Tomando como referencia el día actual)</span>
                       </div>
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div>
@@ -245,7 +244,7 @@ export const OrdersList = () => {
                         </div>
                         <div>
                           <p className="text-sm text-purple-700">
-                            <span className="font-medium">Tiempo:</span> {getRelativeDateString(endDate)}
+                            <span className="font-medium">Tiempo (Si se empezara hoy):</span> {getRelativeDateString(endDate)}
                           </p>
                         </div>
                         <div>
@@ -260,16 +259,16 @@ export const OrdersList = () => {
                   {/* Additional Info */}
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6 text-sm">
                     <div>
-                      <span className="text-gray-600">Promedio/día:</span>
+                      <span className="text-gray-600">Producción promedio/día:</span>
                       <span className="ml-1 font-medium">{order.promedioProduccion.toLocaleString()}</span>
                     </div>
                     <div>
-                      <span className="text-gray-600">Días totales:</span>
+                      <span className="text-gray-600">Días de trabajo totales de la <strong>OP</strong>:</span>
                       <span className="ml-1 font-medium">{workDays}</span>
                     </div>
                     <div>
-                      <span className="text-gray-600">Restante:</span>
-                      <span className="ml-1 font-medium">{remaining.toLocaleString()}</span>
+                      <span className="text-gray-600">Días de trabajo restantes:</span>
+                      <span className="ml-1 font-medium">{remainingDays > 0 ? remainingDays : 0}</span>
                     </div>
                   </div>
 
