@@ -179,14 +179,35 @@ const createOrder = async (req, res) => {
       modulo: Number(modulo),
       unidadesProducidas: 0,
       fechaCreacion: new Date(),
-      fechaFinalizacion
+      fechaFinalizacion,
+      materialesEnBodega: req.body.materialesEnBodega || false
     });
+
+    // Guardar colorBreakdowns si existen
+    if (req.body.colorBreakdowns && req.body.colorBreakdowns.length > 0) {
+      const colorBreakdownsData = req.body.colorBreakdowns.map(breakdown => ({
+        orderId: newOrder.id,
+        color: breakdown.color,
+        size32: breakdown.size32 || 0,
+        size34: breakdown.size34 || 0,
+        size36: breakdown.size36 || 0,
+        size38: breakdown.size38 || 0,
+        size40: breakdown.size40 || 0,
+        size42: breakdown.size42 || 0,
+        totalUnits: breakdown.totalUnits || 0
+      }));
+
+      await ColorSizeBreakdown.bulkCreate(colorBreakdownsData);
+    }
 
     // Obtener la orden creada con relaciones
     const createdOrder = await ProductionOrder.findByPk(newOrder.id, {
       include: [{
         model: ProductionEntry,
         as: 'historialProduccion'
+      }, {
+        model: ColorSizeBreakdown,
+        as: 'colorBreakdowns'
       }]
     });
 
@@ -203,7 +224,8 @@ const createOrder = async (req, res) => {
       fechaCreacion: createdOrder.fechaCreacion,
       fechaFinalizacion: createdOrder.fechaFinalizacion,
       materialesEnBodega: createdOrder.materialesEnBodega || false,
-      historialProduccion: []
+      historialProduccion: [],
+      colorBreakdowns: createdOrder.colorBreakdowns || []
     };
 
     res.status(201).json(formattedOrder);
