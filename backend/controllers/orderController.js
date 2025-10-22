@@ -313,7 +313,8 @@ const updateOrder = async (req, res) => {
         cantidad: entry.cantidad,
         fecha: entry.fecha,
         hora: entry.hora
-      }))
+      })),
+      colorBreakdowns: updatedOrder.colorBreakdowns || []
     };
 
     res.json(formattedOrder);
