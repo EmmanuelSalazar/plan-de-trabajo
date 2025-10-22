@@ -11,7 +11,6 @@ export const ProductionForm = () => {
     fechaEntrada: '',
     ordenProduccion: '',
     referencia: '',
-    color: '',
     promedioProduccion: '',
     cantidadEntrada: '',
     modulo: '',
@@ -97,7 +96,6 @@ export const ProductionForm = () => {
     if (!formData.fechaEntrada) newErrors.fechaEntrada = 'La fecha de entrada es obligatoria';
     if (!formData.ordenProduccion) newErrors.ordenProduccion = 'La orden de producción es obligatoria';
     if (!formData.referencia) newErrors.referencia = 'La referencia es obligatoria';
-    if (!formData.color) newErrors.color = 'El color es obligatorio';
     if (!formData.promedioProduccion) {
       newErrors.promedioProduccion = 'El promedio de producción es obligatorio';
     } else if (Number(formData.promedioProduccion) <= 0) {
@@ -126,7 +124,7 @@ export const ProductionForm = () => {
         fechaEntrada: formData.fechaEntrada,
         ordenProduccion: formData.ordenProduccion,
         referencia: formData.referencia,
-        color: formData.color,
+        color: colorBreakdowns.length > 0 ? colorBreakdowns[0].color : 'Sin especificar',
         promedioProduccion: Number(formData.promedioProduccion),
         cantidadEntrada: Number(formData.cantidadEntrada),
         modulo: Number(formData.modulo),
@@ -139,7 +137,6 @@ export const ProductionForm = () => {
         fechaEntrada: '',
         ordenProduccion: '',
         referencia: '',
-        color: '',
         promedioProduccion: '',
         cantidadEntrada: '',
         modulo: '',
@@ -248,29 +245,6 @@ export const ProductionForm = () => {
                 <div className="flex items-center space-x-1 mt-1">
                   <AlertCircle className="w-4 h-4 text-red-500" />
                   <span className="text-sm text-red-500">{errors.referencia}</span>
-                </div>
-              )}
-            </div>
-
-            {/* Color */}
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Color
-              </label>
-              <input
-                type="text"
-                name="color"
-                value={formData.color}
-                onChange={handleInputChange}
-                placeholder="ej: Azul marino"
-                className={`w-full px-3 py-2 border rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 ${
-                  errors.color ? 'border-red-300' : 'border-gray-300'
-                }`}
-              />
-              {errors.color && (
-                <div className="flex items-center space-x-1 mt-1">
-                  <AlertCircle className="w-4 h-4 text-red-500" />
-                  <span className="text-sm text-red-500">{errors.color}</span>
                 </div>
               )}
             </div>
