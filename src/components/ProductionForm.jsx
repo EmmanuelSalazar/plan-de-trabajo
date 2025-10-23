@@ -465,3 +465,8 @@ export const ProductionForm = () => {
               <span>{loading ? 'Guardando...' : 'Guardar Orden'}</span>
             </button>
           </div>
+        </form>
+      </div>
+    </div>
+  );
+};
