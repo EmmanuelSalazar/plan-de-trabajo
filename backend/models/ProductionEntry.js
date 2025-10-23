@@ -25,7 +25,7 @@ const ProductionEntry = sequelize.define('production_entries', {
   },
   fecha: {
     type: DataTypes.DATEONLY,
-    allowNull: false
+    allowNull: true
   },
   hora: {
     type: DataTypes.TIME,
