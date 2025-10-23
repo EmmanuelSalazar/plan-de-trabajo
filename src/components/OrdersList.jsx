@@ -151,6 +151,43 @@ export const OrdersList = () => {
                       </div>
                       <p className="text-gray-600">Referencia: <strong>{order.referencia}</strong></p>
                     </div>
+
+                    {/* Color Breakdowns Display - Moved here */}
+                    {order.colorBreakdowns && order.colorBreakdowns.length > 0 && (
+                      <div className="mb-4 max-w-md">
+                        <details className="border border-gray-200 rounded-lg bg-gray-50">
+                          <summary className="cursor-pointer p-3 font-medium text-gray-700 hover:bg-gray-100 rounded-lg">
+                            📊 Desglose por Colores y Tallas ({order.colorBreakdowns.length} colores)
+                          </summary>
+                          <div className="p-3 pt-0 space-y-2">
+                            {order.colorBreakdowns.map((breakdown, index) => (
+                              <div key={breakdown.id || index} className="border border-gray-200 rounded-lg p-3 bg-white">
+                                <div className="flex items-center justify-between mb-2">
+                                  <span className="font-medium text-gray-800 uppercase">{breakdown.color}</span>
+                                  <span className="text-sm text-gray-600">Total: {breakdown.totalUnits}</span>
+                                </div>
+                                <div className="grid grid-cols-6 gap-2 text-sm">
+                                  {[
+                                    { size: '32', value: breakdown.size32 },
+                                    { size: '34', value: breakdown.size34 },
+                                    { size: '36', value: breakdown.size36 },
+                                    { size: '38', value: breakdown.size38 },
+                                    { size: '40', value: breakdown.size40 },
+                                    { size: '42', value: breakdown.size42 }
+                                  ].map(({ size, value }) => (
+                                    <div key={size} className="text-center">
+                                      <div className="text-xs text-gray-500">{size}</div>
+                                      <div className="font-medium text-gray-900">{value}</div>
+                                    </div>
+                                  ))}
+                                </div>
+                              </div>
+                            ))}
+                          </div>
+                        </details>
+                      </div>
+                    )}
+
                     <div className="flex items-center space-x-2">
                       {getStatusBadge(order)}
                       <div className="flex items-center space-x-1 text-sm">
@@ -173,41 +210,6 @@ export const OrdersList = () => {
                     </div>
                   </div>
 
-                  {/* Color Breakdowns Display */}
-                  {order.colorBreakdowns && order.colorBreakdowns.length > 0 && (
-                    <div className="mb-4 max-w-md">
-                      <details className="border border-gray-200 rounded-lg bg-gray-50">
-                        <summary className="cursor-pointer p-3 font-medium text-gray-700 hover:bg-gray-100 rounded-lg">
-                          📊 Desglose por Colores y Tallas ({order.colorBreakdowns.length} colores)
-                        </summary>
-                        <div className="p-3 pt-0 space-y-2">
-                          {order.colorBreakdowns.map((breakdown, index) => (
-                            <div key={breakdown.id || index} className="border border-gray-200 rounded-lg p-3 bg-white">
-                              <div className="flex items-center justify-between mb-2">
-                                <span className="font-medium text-gray-800 uppercase">{breakdown.color}</span>
-                                <span className="text-sm text-gray-600">Total: {breakdown.totalUnits}</span>
-                              </div>
-                              <div className="grid grid-cols-6 gap-2 text-sm">
-                                {[
-                                  { size: '32', value: breakdown.size32 },
-                                  { size: '34', value: breakdown.size34 },
-                                  { size: '36', value: breakdown.size36 },
-                                  { size: '38', value: breakdown.size38 },
-                                  { size: '40', value: breakdown.size40 },
-                                  { size: '42', value: breakdown.size42 }
-                                ].map(({ size, value }) => (
-                                  <div key={size} className="text-center">
-                                    <div className="text-xs text-gray-500">{size}</div>
-                                    <div className="font-medium text-gray-900">{value}</div>
-                                  </div>
-                                ))}
-                              </div>
-                            </div>
-                          ))}
-                        </div>
-                      </details>
-                    </div>
-                  )}
 
                   {/* Progress Bar */}
                   <div className="mb-4">
