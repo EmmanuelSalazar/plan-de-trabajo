@@ -300,6 +300,33 @@ export const ProductionForm = () => {
                     </div>
                   )}
                 </div>
+
+                {/* Módulo */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Módulo Asignado
+                  </label>
+                  <select
+                    name="modulo"
+                    value={formData.modulo}
+                    onChange={handleInputChange}
+                    className={`w-full px-3 py-2 border rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 ${
+                      errors.modulo ? 'border-red-300' : 'border-gray-300'
+                    }`}
+                  >
+                    <option value="">Seleccionar módulo</option>
+                    <option value="1">Módulo 1</option>
+                    <option value="2">Módulo 2</option>
+                    <option value="3">Módulo 3</option>
+                    <option value="4">Módulo 4</option>
+                  </select>
+                  {errors.modulo && (
+                    <div className="flex items-center space-x-1 mt-1">
+                      <AlertCircle className="w-4 h-4 text-red-500" />
+                      <span className="text-sm text-red-500">{errors.modulo}</span>
+                    </div>
+                  )}
+                </div>
               </div>
 
               {/* Materiales en Bodega */}
@@ -323,33 +350,6 @@ export const ProductionForm = () => {
                 <p className="text-xs text-green-600">
                   Marca esta casilla si todos los materiales están listos para producción
                 </p>
-              </div>
-
-              {/* Módulo */}
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Módulo Asignado
-                </label>
-                <select
-                  name="modulo"
-                  value={formData.modulo}
-                  onChange={handleInputChange}
-                  className={`w-full px-3 py-2 border rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 ${
-                    errors.modulo ? 'border-red-300' : 'border-gray-300'
-                  }`}
-                >
-                  <option value="">Seleccionar módulo</option>
-                  <option value="1">Módulo 1</option>
-                  <option value="2">Módulo 2</option>
-                  <option value="3">Módulo 3</option>
-                  <option value="4">Módulo 4</option>
-                </select>
-                {errors.modulo && (
-                  <div className="flex items-center space-x-1 mt-1">
-                    <AlertCircle className="w-4 h-4 text-red-500" />
-                    <span className="text-sm text-red-500">{errors.modulo}</span>
-                  </div>
-                )}
               </div>
             </div>
 
