@@ -51,6 +51,17 @@ const getAllOrders = async (req, res) => {
       fechaCreacion: order.fechaCreacion,
       fechaFinalizacion: order.fechaFinalizacion,
       materialesEnBodega: order.materialesEnBodega || false,
+      colorBreakdowns: order.colorBreakdowns ? order.colorBreakdowns.map(breakdown => ({
+        id: breakdown.id,
+        color: breakdown.color,
+        size32: breakdown.size32,
+        size34: breakdown.size34,
+        size36: breakdown.size36,
+        size38: breakdown.size38,
+        size40: breakdown.size40,
+        size42: breakdown.size42,
+        totalUnits: breakdown.totalUnits
+      })) : [],
       historialProduccion: order.historialProduccion.map(entry => ({
         id: entry.id.toString(),
         cantidad: entry.cantidad,
@@ -102,6 +113,17 @@ const getOrderById = async (req, res) => {
       fechaCreacion: order.fechaCreacion,
       fechaFinalizacion: order.fechaFinalizacion,
       materialesEnBodega: order.materialesEnBodega || false,
+      colorBreakdowns: order.colorBreakdowns ? order.colorBreakdowns.map(breakdown => ({
+        id: breakdown.id,
+        color: breakdown.color,
+        size32: breakdown.size32,
+        size34: breakdown.size34,
+        size36: breakdown.size36,
+        size38: breakdown.size38,
+        size40: breakdown.size40,
+        size42: breakdown.size42,
+        totalUnits: breakdown.totalUnits
+      })) : [],
       historialProduccion: order.historialProduccion.map(entry => ({
         id: entry.id.toString(),
         cantidad: entry.cantidad,
@@ -292,6 +314,9 @@ const updateOrder = async (req, res) => {
         model: ProductionEntry,
         as: 'historialProduccion',
         order: [['created_at', 'DESC']]
+      }, {
+        model: ColorSizeBreakdown,
+        as: 'colorBreakdowns'
       }]
     });
 
@@ -308,13 +333,23 @@ const updateOrder = async (req, res) => {
       fechaCreacion: updatedOrder.fechaCreacion,
       fechaFinalizacion: updatedOrder.fechaFinalizacion,
       materialesEnBodega: updatedOrder.materialesEnBodega || false,
+      colorBreakdowns: updatedOrder.colorBreakdowns ? updatedOrder.colorBreakdowns.map(breakdown => ({
+        id: breakdown.id,
+        color: breakdown.color,
+        size32: breakdown.size32,
+        size34: breakdown.size34,
+        size36: breakdown.size36,
+        size38: breakdown.size38,
+        size40: breakdown.size40,
+        size42: breakdown.size42,
+        totalUnits: breakdown.totalUnits
+      })) : [],
       historialProduccion: updatedOrder.historialProduccion.map(entry => ({
         id: entry.id.toString(),
         cantidad: entry.cantidad,
         fecha: entry.fecha,
         hora: entry.hora
-      })),
-      colorBreakdowns: updatedOrder.colorBreakdowns || []
+      }))
     };
 
     res.json(formattedOrder);
