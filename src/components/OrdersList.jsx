@@ -1,9 +1,12 @@
 import React, { useState } from 'react';
+import { useRef } from 'react';
+import { useReactToPrint } from 'react-to-print';
 import { useProduction } from '../context/ProductionContext';
 import { ProductionModal } from './ProductionModal';
 import { HistoryModal } from './HistoryModal';
 import { EditOrderModal } from './EditOrderModal';
-import { Plus, History, Calendar, Package, Target, PackageX, Users, CalendarDays, Filter, Search, CreditCard as Edit, CheckCircle, AlertTriangle } from 'lucide-react';
+import { PrintableOrder } from './PrintableOrder';
+import { Plus, History, Calendar, Package, Target, PackageX, Users, CalendarDays, Filter, Search, CreditCard as Edit, CheckCircle, AlertTriangle, Printer } from 'lucide-react';
 import { formatDate, getRelativeDateString, calculateRemainingWorkEndDate, getExplicitTime } from '../utils/dateUtils';
 
 export const OrdersList = () => {
@@ -13,6 +16,7 @@ export const OrdersList = () => {
   const [editOrderModalOpen, setEditOrderModalOpen] = useState(false);
   const [selectedOrder, setSelectedOrder] = useState(null);
   const [selectedModule, setSelectedModule] = useState('all');
+  const printRef = useRef();
 
   // Filter orders by module
   const filteredOrders = selectedModule === 'all' 
@@ -64,6 +68,31 @@ export const OrdersList = () => {
         console.error('Error updating order:', error);
       }
     }
+  };
+
+  const handlePrint = useReactToPrint({
+    content: () => printRef.current,
+    documentTitle: `Orden_${selectedOrder?.ordenProduccion || 'Produccion'}`,
+    pageStyle: `
+      @page {
+        size: A4;
+        margin: 20mm;
+      }
+      @media print {
+        body {
+          -webkit-print-color-adjust: exact;
+          color-adjust: exact;
+        }
+      }
+    `
+  });
+
+  const openPrintModal = (order) => {
+    setSelectedOrder(order);
+    // Small delay to ensure the component is rendered before printing
+    setTimeout(() => {
+      handlePrint();
+    }, 100);
   };
 
   const getProgressColor = (progress) => {
@@ -341,11 +370,25 @@ export const OrdersList = () => {
                       <Edit className="w-4 h-4" />
                       <span>Editar Orden</span>
                     </button>
+                    <button
+                      onClick={() => openPrintModal(order)}
+                      className="flex items-center space-x-2 px-4 py-2 bg-purple-100 text-purple-700 rounded-md hover:bg-purple-200 transition-colors"
+                    >
+                      <Printer className="w-4 h-4" />
+                      <span>Imprimir</span>
+                    </button>
                   </div>
                 </div>
               </div>
             );
           })}
+        </div>
+      )}
+
+      {/* Hidden Printable Component */}
+      {selectedOrder && (
+        <div style={{ display: 'none' }}>
+          <PrintableOrder ref={printRef} order={selectedOrder} />
         </div>
       )}
 
