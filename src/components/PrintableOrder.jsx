@@ -75,7 +75,7 @@ export const PrintableOrder = React.forwardRef(({ order }, ref) => {
         {/* Left Column - Order Info */}
         <div className="lg:col-span-2 space-y-6">
           {/* Progress Section */}
-          <div className="bg-gray-50 p-4 rounded-lg">
+          {/* <div className="bg-gray-50 p-4 rounded-lg">
             <h3 className="font-semibold text-gray-900 mb-3">Progreso</h3>
             <div className="mb-2">
               <div className="flex justify-between items-center mb-1">
@@ -89,7 +89,7 @@ export const PrintableOrder = React.forwardRef(({ order }, ref) => {
                 />
               </div>
             </div>
-          </div>
+          </div> */}
 
           {/* Production Info */}
           <div className="grid grid-cols-2 gap-4">
@@ -135,7 +135,7 @@ export const PrintableOrder = React.forwardRef(({ order }, ref) => {
           </div>
 
           {/* Estimated End Date */}
-          {progress < 100 && (
+          {/* {progress < 100 && (
             <div className="bg-purple-50 p-4 rounded-lg border border-purple-200">
               <div className="flex items-center space-x-2 mb-3">
                 <Clock className="w-5 h-5 text-purple-600" />
@@ -154,10 +154,10 @@ export const PrintableOrder = React.forwardRef(({ order }, ref) => {
                 </p>
               </div>
             </div>
-          )}
+          )} */}
 
           {/* Production Stats */}
-          <div className="grid grid-cols-3 gap-4 text-sm">
+          {/* <div className="grid grid-cols-3 gap-4 text-sm">
             <div className="text-center">
               <span className="block text-gray-600">Producción promedio/día:</span>
               <span className="block font-semibold text-lg">{order.promedioProduccion.toLocaleString()}</span>
@@ -170,7 +170,7 @@ export const PrintableOrder = React.forwardRef(({ order }, ref) => {
               <span className="block text-gray-600">Días de trabajo restantes:</span>
               <span className="block font-semibold text-lg">{remainingDays > 0 ? remainingDays : 0}</span>
             </div>
-          </div>
+          </div> */}
         </div>
 
         {/* Right Column - Color Breakdown */}
