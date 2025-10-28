@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { useRef } from 'react';
+import { useRef, useCallback } from 'react';
 import { useReactToPrint } from 'react-to-print';
 import { useProduction } from '../context/ProductionContext';
 import { ProductionModal } from './ProductionModal';
@@ -16,7 +16,7 @@ export const OrdersList = () => {
   const [editOrderModalOpen, setEditOrderModalOpen] = useState(false);
   const [selectedOrder, setSelectedOrder] = useState(null);
   const [selectedModule, setSelectedModule] = useState('all');
-  const printRef = useRef();
+  const printRef = useRef(null);
 
   // Filter orders by module
   const filteredOrders = selectedModule === 'all' 
@@ -71,7 +71,7 @@ export const OrdersList = () => {
   };
 
   const handlePrint = useReactToPrint({
-    content: () => printRef.current,
+    contentRef: printRef,
     documentTitle: `Orden_${selectedOrder?.ordenProduccion || 'Produccion'}`,
     pageStyle: `
       @page {
@@ -84,15 +84,16 @@ export const OrdersList = () => {
           color-adjust: exact;
         }
       }
-    `
+    `,
+    onBeforeGetContent: useCallback(() => {
+      return Promise.resolve();
+    }, []),
   });
 
   const openPrintModal = (order) => {
     setSelectedOrder(order);
-    // Small delay to ensure the component is rendered before printing
-    setTimeout(() => {
-      handlePrint();
-    }, 100);
+    // Usar setTimeout para asegurar que el componente se renderice antes de imprimir
+    setTimeout(handlePrint, 100);
   };
 
   const getProgressColor = (progress) => {
