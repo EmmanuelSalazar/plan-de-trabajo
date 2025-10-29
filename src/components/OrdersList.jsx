@@ -234,6 +234,17 @@ export const OrdersList = () => {
                             <span>Materiales incompletos</span>
                           </span>
                         )}
+                        {order.enProduccion ? (
+                          <span className="px-2 py-1 text-xs rounded-full bg-blue-100 text-blue-800 flex items-center space-x-1">
+                            <span>🏭</span>
+                            <span>En producción</span>
+                          </span>
+                        ) : (
+                          <span className="px-2 py-1 text-xs rounded-full bg-gray-100 text-gray-800 flex items-center space-x-1">
+                            <span>⏸️</span>
+                            <span>Sin iniciar</span>
+                          </span>
+                        )}
                       </div>
                       <div className="flex items-center space-x-1 text-sm text-gray-500">
                         <Users className="w-4 h-4" />
