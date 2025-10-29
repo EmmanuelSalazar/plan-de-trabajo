@@ -326,6 +326,29 @@ export const EditOrderModal = ({ isOpen, onClose, onSubmit, order, loading }) =>
               Marca esta casilla si todos los materiales están listos para producción
             </p>
           </div>
+
+          {/* En Producción */}
+          <div className="p-4 bg-blue-50 rounded-lg border border-blue-200 mt-4">
+            <div className="flex items-center space-x-3 mb-2">
+            <input
+              type="checkbox"
+              id="enProduccionEdit"
+              name="enProduccion"
+              checked={formData.enProduccion}
+              onChange={(e) => setFormData(prev => ({
+                ...prev,
+                enProduccion: e.target.checked
+              }))}
+              className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 focus:ring-2"
+            />
+            <label htmlFor="enProduccionEdit" className="text-sm font-medium text-blue-800">
+              En producción
+            </label>
+            </div>
+            <p className="text-xs text-blue-600">
+              Marca esta casilla si la orden ya está siendo producida
+            </p>
+          </div>
         </div>
 
         <div className="px-6 py-4 border-t border-gray-200 flex justify-end space-x-3">

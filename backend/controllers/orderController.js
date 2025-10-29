@@ -333,6 +333,7 @@ const updateOrder = async (req, res) => {
       fechaCreacion: updatedOrder.fechaCreacion,
       fechaFinalizacion: updatedOrder.fechaFinalizacion,
       materialesEnBodega: updatedOrder.materialesEnBodega || false,
+      enProduccion: updatedOrder.enProduccion || false,
       colorBreakdowns: updatedOrder.colorBreakdowns ? updatedOrder.colorBreakdowns.map(breakdown => ({
         id: breakdown.id,
         color: breakdown.color,
