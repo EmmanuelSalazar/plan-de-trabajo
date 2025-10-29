@@ -68,6 +68,11 @@ const ProductionOrder = sequelize.define('production_orders', {
     type: DataTypes.INTEGER,
     defaultValue: 0,
     field: 'sequence_order'
+  },
+  enProduccion: {
+    type: DataTypes.BOOLEAN,
+    defaultValue: false,
+    field: 'en_produccion'
   }
 }, {
   tableName: 'production_orders',
