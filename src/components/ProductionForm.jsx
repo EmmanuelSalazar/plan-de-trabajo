@@ -15,6 +15,7 @@ export const ProductionForm = () => {
     cantidadEntrada: '',
     modulo: '',
     materialesEnBodega: false,
+    enProduccion: false,
   });
   
   const [errors, setErrors] = useState({});
@@ -129,6 +130,7 @@ export const ProductionForm = () => {
         cantidadEntrada: Number(formData.cantidadEntrada),
         modulo: Number(formData.modulo),
         materialesEnBodega: formData.materialesEnBodega,
+        enProduccion: formData.enProduccion,
         colorBreakdowns: colorBreakdowns.filter(breakdown => breakdown.color.trim() !== '')
       });
 
