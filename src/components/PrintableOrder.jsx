@@ -1,6 +1,5 @@
 import React from 'react';
-import { Calendar, Package, Target, Clock, Users } from 'lucide-react';
-import { formatDate, getRelativeDateString, calculateRemainingWorkEndDate, getExplicitTime } from '../utils/dateUtils';
+import { calculateRemainingWorkEndDate, getExplicitTime } from '../utils/dateUtils';
 
 export const PrintableOrder = React.forwardRef(({ order }, ref) => {
   const calculateWorkDays = (cantidadEntrada, promedioProduccion) => {

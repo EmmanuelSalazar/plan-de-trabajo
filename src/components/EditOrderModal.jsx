@@ -11,6 +11,7 @@ export const EditOrderModal = ({ isOpen, onClose, onSubmit, order, loading }) =>
     cantidadEntrada: '',
     modulo: '',
     materialesEnBodega: false,
+    enProduccion: false,
   });
   
   const [errors, setErrors] = useState({});
@@ -26,6 +27,7 @@ export const EditOrderModal = ({ isOpen, onClose, onSubmit, order, loading }) =>
         cantidadEntrada: order.cantidadEntrada?.toString() || '',
         modulo: order.modulo?.toString() || '',
         materialesEnBodega: order.materialesEnBodega || false,
+        enProduccion: order.enProduccion || false,
       });
       setErrors({});
     }
@@ -93,6 +95,7 @@ export const EditOrderModal = ({ isOpen, onClose, onSubmit, order, loading }) =>
       cantidadEntrada: Number(formData.cantidadEntrada),
       modulo: Number(formData.modulo),
       materialesEnBodega: formData.materialesEnBodega,
+      enProduccion: formData.enProduccion,
     };
 
     try {

@@ -51,6 +51,7 @@ const getAllOrders = async (req, res) => {
       fechaCreacion: order.fechaCreacion,
       fechaFinalizacion: order.fechaFinalizacion,
       materialesEnBodega: order.materialesEnBodega || false,
+      enProduccion: order.enProduccion || false,
       colorBreakdowns: order.colorBreakdowns ? order.colorBreakdowns.map(breakdown => ({
         id: breakdown.id,
         color: breakdown.color,
@@ -152,7 +153,9 @@ const createOrder = async (req, res) => {
       color,
       promedioProduccion,
       cantidadEntrada,
-      modulo
+      modulo,
+      materialesEnBodega,
+      enProduccion
     } = req.body;
 
     // Validaciones
@@ -202,7 +205,8 @@ const createOrder = async (req, res) => {
       unidadesProducidas: 0,
       fechaCreacion: new Date(),
       fechaFinalizacion,
-      materialesEnBodega: req.body.materialesEnBodega || false
+      materialesEnBodega: materialesEnBodega || false,
+      enProduccion: enProduccion || false
     });
 
     // Guardar colorBreakdowns si existen
@@ -246,6 +250,7 @@ const createOrder = async (req, res) => {
       fechaCreacion: createdOrder.fechaCreacion,
       fechaFinalizacion: createdOrder.fechaFinalizacion,
       materialesEnBodega: createdOrder.materialesEnBodega || false,
+      enProduccion: createdOrder.enProduccion || false,
       historialProduccion: [],
       colorBreakdowns: createdOrder.colorBreakdowns || []
     };
@@ -486,6 +491,26 @@ const deleteProductionEntry = async (req, res) => {
 
 const updateOrderSequence = "";
 
+// OBTENER ORDENES QUE SE ENCUENTRAN EN PRODUCCIÓN
+const getOrdersInProduction = async (req, res) => {
+  try {
+    const orders = await ProductionOrder.findAll({
+      where: {
+        enProduccion: true
+      },
+      attributes: ['ordenProduccion', 'referencia', 'modulo', 'unidadesProducidas', 'cantidadEntrada', 'promedioProduccion']
+    });
+
+    res.json(orders);
+  } catch (error) {
+    console.error('Error fetching orders in production:', error);
+    res.status(500).json({ 
+      error: 'Error interno del servidor',
+      message: error.message 
+    });
+  }
+};
+
 module.exports = {
   getAllOrders,
   getOrderById,
@@ -494,5 +519,6 @@ module.exports = {
   deleteOrder,
   addProduction,
   deleteProductionEntry,
+  getOrdersInProduction,
   updateOrderSequence
 };
