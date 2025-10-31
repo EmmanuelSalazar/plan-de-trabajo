@@ -15,9 +15,9 @@
   },
   "production": {
     "username": "workplan",
-    "password": "",
+    "password": "j7)qxbt!/MR3/]q(",
     "database": "alt_workplan",
-    "host": "",
+    "host": "192.168.1.69",
     "dialect": "mysql"
   }
 }

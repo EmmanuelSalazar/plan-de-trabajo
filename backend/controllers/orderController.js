@@ -145,6 +145,9 @@ const getOrderById = async (req, res) => {
 
 // Crear nueva orden
 const createOrder = async (req, res) => {
+  // 1. Iniciar la transacción
+  const t = await ProductionOrder.sequelize.transaction();
+
   try {
     const {
       fechaEntrada,
@@ -172,28 +175,47 @@ const createOrder = async (req, res) => {
       });
     }
 
-    if (![1, 2, 3, 4].includes(Number(modulo))) {
+    const numericModulo = Number(modulo);
+    if (![1, 2, 3, 4].includes(numericModulo)) {
       return res.status(400).json({ 
         error: 'El módulo debe ser 1, 2, 3 o 4' 
       });
     }
 
-    // Verificar que la orden no exista
     const existingOrder = await ProductionOrder.findOne({
-      where: { ordenProduccion }
+      where: { ordenProduccion },
+      transaction: t
     });
 
     if (existingOrder) {
+      // Revertir la transacción si falla la validación
+      await t.rollback(); 
       return res.status(400).json({ 
         error: 'Ya existe una orden con este número' 
       });
     }
 
-    // Calcular fecha de finalización
+    const isEnProduccion = enProduccion || false;
+    
+    // 2. Si la nueva orden está en producción, desactivar las demás en el mismo módulo
+    if (isEnProduccion) {
+      await ProductionOrder.update(
+        { enProduccion: false },
+        {
+          where: { 
+            modulo: numericModulo,
+            en_produccion: true // Opcional: solo actualizar las que ya están activas
+          },
+          transaction: t // Importante: usar la transacción
+        }
+      );
+      // ¡Ahora todas las demás órdenes en este módulo están desactivadas (en_produccion = 0)!
+    }
+
     const workDays = cantidadEntrada / promedioProduccion;
     const fechaFinalizacion = calculateWorkEndDate(fechaEntrada, workDays);
 
-    // Crear la orden
+    // Crear la orden (usando la transacción)
     const newOrder = await ProductionOrder.create({
       fechaEntrada,
       ordenProduccion,
@@ -201,15 +223,15 @@ const createOrder = async (req, res) => {
       color,
       promedioProduccion: Number(promedioProduccion),
       cantidadEntrada: Number(cantidadEntrada),
-      modulo: Number(modulo),
+      modulo: numericModulo,
       unidadesProducidas: 0,
       fechaCreacion: new Date(),
       fechaFinalizacion,
       materialesEnBodega: materialesEnBodega || false,
-      enProduccion: enProduccion || false
-    });
+      enProduccion: isEnProduccion
+    }, { transaction: t });
 
-    // Guardar colorBreakdowns si existen
+    // Guardar colorBreakdowns si existen (usando la transacción)
     if (req.body.colorBreakdowns && req.body.colorBreakdowns.length > 0) {
       const colorBreakdownsData = req.body.colorBreakdowns.map(breakdown => ({
         orderId: newOrder.id,
@@ -223,10 +245,11 @@ const createOrder = async (req, res) => {
         totalUnits: breakdown.totalUnits || 0
       }));
 
-      await ColorSizeBreakdown.bulkCreate(colorBreakdownsData);
+      await ColorSizeBreakdown.bulkCreate(colorBreakdownsData, { transaction: t });
     }
 
-    // Obtener la orden creada con relaciones
+    // Obtener la orden creada con relaciones (usando la transacción)
+    // Nota: findByPk también debe estar en la transacción si quieres que lea los datos recién insertados
     const createdOrder = await ProductionOrder.findByPk(newOrder.id, {
       include: [{
         model: ProductionEntry,
@@ -234,9 +257,14 @@ const createOrder = async (req, res) => {
       }, {
         model: ColorSizeBreakdown,
         as: 'colorBreakdowns'
-      }]
+      }],
+      transaction: t // Importante: usar la transacción
     });
 
+    // 3. Confirmar la transacción
+    await t.commit(); 
+
+    // Formatear y devolver la respuesta
     const formattedOrder = {
       id: createdOrder.id.toString(),
       fechaEntrada: createdOrder.fechaEntrada,
@@ -251,12 +279,15 @@ const createOrder = async (req, res) => {
       fechaFinalizacion: createdOrder.fechaFinalizacion,
       materialesEnBodega: createdOrder.materialesEnBodega || false,
       enProduccion: createdOrder.enProduccion || false,
-      historialProduccion: [],
+      historialProduccion: createdOrder.historialProduccion || [],
       colorBreakdowns: createdOrder.colorBreakdowns || []
     };
 
     res.status(201).json(formattedOrder);
   } catch (error) {
+    // 4. Si hay un error, revertir la transacción
+    if (t) await t.rollback();
+
     console.error('Error creating order:', error);
     
     if (error.name === 'SequelizeUniqueConstraintError') {
@@ -274,24 +305,30 @@ const createOrder = async (req, res) => {
 
 // Actualizar orden
 const updateOrder = async (req, res) => {
+  // 1. Iniciar la transacción
+  const t = await ProductionOrder.sequelize.transaction();
+  const { id } = req.params;
+
   try {
     console.log('📝 [UPDATE_ORDER] Iniciando actualización de orden...');
-    const { id } = req.params;
     const updateData = req.body;
     
     console.log('📝 [UPDATE_ORDER] ID de orden:', id);
     console.log('📝 [UPDATE_ORDER] Datos a actualizar:', updateData);
 
-    const order = await ProductionOrder.findByPk(id);
+    // 2. Buscar la orden dentro de la transacción
+    const order = await ProductionOrder.findByPk(id, { transaction: t });
     
     if (!order) {
       console.log('❌ [UPDATE_ORDER] Orden no encontrada con ID:', id);
+      await t.rollback();
       return res.status(404).json({ error: 'Orden no encontrada' });
     }
 
     // Validar que la nueva cantidad no sea menor a las unidades ya producidas
     if (updateData.cantidadEntrada && updateData.cantidadEntrada < order.unidadesProducidas) {
       console.log('❌ [UPDATE_ORDER] Cantidad menor a unidades producidas');
+      await t.rollback();
       return res.status(400).json({ 
         error: `La cantidad no puede ser menor a las unidades ya producidas (${order.unidadesProducidas})` 
       });
@@ -305,15 +342,43 @@ const updateOrder = async (req, res) => {
       
       if (remaining > 0) {
         const remainingDays = remaining / promedio;
-        const newEndDate = calculateWorkEndDate(new Date(), remainingDays);
+        const startDate = updateData.fechaEntrada || order.fechaEntrada; 
+        const newEndDate = calculateWorkEndDate(startDate, remainingDays);
         updateData.fechaFinalizacion = newEndDate;
         console.log('📅 [UPDATE_ORDER] Nueva fecha de finalización calculada:', newEndDate);
       }
     }
 
-    await order.update(updateData);
+    // Se ejecuta SOLAMENTE si se intenta poner esta orden 'enProduccion = true'
+    const isActivatingProduction = updateData.enProduccion === true || updateData.enProduccion === 1;
+    
+    if (isActivatingProduction) {
+      // Usar el módulo existente si no se está actualizando
+      const moduloToUpdate = updateData.modulo || order.modulo;
+
+      console.log(`⚠️ Desactivando otras órdenes en Módulo ${moduloToUpdate}...`);
+      
+      // 3. Desactivar todas las demás órdenes en producción para ese módulo
+      await ProductionOrder.update(
+        { enProduccion: false },
+        {
+          where: { 
+            modulo: moduloToUpdate,
+            id: { [Op.ne]: id }, // Excluir la orden actual
+            en_produccion: true
+          },
+          transaction: t
+        }
+      );
+      console.log('✅ Desactivación de órdenes previas completada.');
+    }
+    // 🌟 FIN LÓGICA DE NEGOCIO 🌟
+
+    // 4. Actualizar la orden dentro de la transacción
+    await order.update(updateData, { transaction: t });
     console.log('✅ [UPDATE_ORDER] Orden actualizada correctamente');
 
+    // 5. Buscar la orden actualizada con relaciones (dentro de la transacción)
     const updatedOrder = await ProductionOrder.findByPk(id, {
       include: [{
         model: ProductionEntry,
@@ -322,9 +387,14 @@ const updateOrder = async (req, res) => {
       }, {
         model: ColorSizeBreakdown,
         as: 'colorBreakdowns'
-      }]
+      }],
+      transaction: t // ¡Fundamental!
     });
 
+    // 6. Confirmar la transacción
+    await t.commit(); 
+
+    // Formatear y devolver la respuesta (fuera de la transacción)
     const formattedOrder = {
       id: updatedOrder.id.toString(),
       fechaEntrada: updatedOrder.fechaEntrada,
@@ -360,6 +430,9 @@ const updateOrder = async (req, res) => {
 
     res.json(formattedOrder);
   } catch (error) {
+    // 7. Si hay un error, revertir la transacción
+    if (t) await t.rollback(); 
+
     console.error('Error updating order:', error);
     res.status(500).json({ 
       error: 'Error interno del servidor',
