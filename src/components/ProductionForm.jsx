@@ -362,10 +362,23 @@ export const ProductionForm = () => {
                   id="enProduccion"
                   name="enProduccion"
                   checked={formData.enProduccion}
-                  onChange={(e) => setFormData(prev => ({
-                    ...prev,
-                    enProduccion: e.target.checked
-                  }))}
+                  onChange={(e) => {
+                    const confirm = e.target.checked
+                    if (confirm) {
+                      const confirm = window.confirm('¿Estás seguro de marcar esta orden como en producción? Esto desactivará cualquier otra orden en producción del mismo modulo.')
+                      if (confirm) {
+                         return setFormData(prev => ({
+                          ...prev,
+                          enProduccion: true
+                        }))
+                      }
+                    } else {
+                        setFormData(prev => ({
+                          ...prev,
+                          enProduccion: false
+                        }))
+                      }
+                  }}
                   className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 focus:ring-2"
                 />
                 <label htmlFor="enProduccion" className="text-sm font-medium text-blue-800">
