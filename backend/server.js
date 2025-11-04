@@ -17,7 +17,7 @@ app.use(helmet());
 // Rate limiting
 const limiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutos
-  max: 100, // máximo 100 requests por ventana de tiempo
+  max: 500  , // máximo 500 requests por ventana de tiempo
   message: {
     error: 'Demasiadas solicitudes, intenta de nuevo más tarde.'
   }
