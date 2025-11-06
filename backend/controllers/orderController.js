@@ -153,6 +153,7 @@ const createOrder = async (req, res) => {
       fechaEntrada,
       ordenProduccion,
       referencia,
+      ref_id,
       color,
       promedioProduccion,
       cantidadEntrada,
@@ -162,7 +163,7 @@ const createOrder = async (req, res) => {
     } = req.body;
 
     // Validaciones
-    if (!fechaEntrada || !ordenProduccion || !referencia || !color || 
+    if (!fechaEntrada || !ordenProduccion || !referencia || !ref_id || !color || 
         !promedioProduccion || !cantidadEntrada || !modulo) {
       return res.status(400).json({ 
         error: 'Todos los campos son obligatorios' 
@@ -220,6 +221,7 @@ const createOrder = async (req, res) => {
       fechaEntrada,
       ordenProduccion,
       referencia,
+      ref_id,
       color,
       promedioProduccion: Number(promedioProduccion),
       cantidadEntrada: Number(cantidadEntrada),
@@ -270,6 +272,7 @@ const createOrder = async (req, res) => {
       fechaEntrada: createdOrder.fechaEntrada,
       ordenProduccion: createdOrder.ordenProduccion,
       referencia: createdOrder.referencia,
+      ref_id: createdOrder.ref_id,
       color: createdOrder.color,
       promedioProduccion: createdOrder.promedioProduccion,
       cantidadEntrada: createdOrder.cantidadEntrada,

@@ -6,7 +6,8 @@ import { Save, AlertCircle, Loader2, Plus, X } from 'lucide-react';
 export const ProductionForm = () => {
   const navigate = useNavigate();
   const { addOrder, loading, error } = useProduction();
-  
+  const references = JSON.parse(localStorage.getItem('references'))?.data;
+  console.log(references)
   const [formData, setFormData] = useState({
     fechaEntrada: '',
     ordenProduccion: '',
@@ -125,6 +126,7 @@ export const ProductionForm = () => {
         fechaEntrada: formData.fechaEntrada,
         ordenProduccion: formData.ordenProduccion,
         referencia: formData.referencia,
+        ref_id: references?.find(ref => ref.referencia === formData.referencia)?.ref_id || '',
         color: colorBreakdowns.length > 0 ? colorBreakdowns[0].color : 'Sin especificar',
         promedioProduccion: Number(formData.promedioProduccion),
         cantidadEntrada: Number(formData.cantidadEntrada),
@@ -139,6 +141,7 @@ export const ProductionForm = () => {
         fechaEntrada: '',
         ordenProduccion: '',
         referencia: '',
+        ref_id: '',
         promedioProduccion: '',
         cantidadEntrada: '',
         modulo: '',
@@ -237,7 +240,21 @@ export const ProductionForm = () => {
                   <label className="block text-sm font-medium text-gray-700 mb-2">
                     Referencia
                   </label>
-                  <input
+                  <select
+                    name="referencia"
+                    value={formData.referencia}
+                    onChange={handleInputChange}
+                    className={`w-full px-3 py-2 border rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 ${
+                      errors.referencia ? 'border-red-300' : 'border-gray-300'
+                    }`}
+                  >
+                    {references?.map((ref) => (
+                      <option key={ref.ref_id} value={ref.referencia}>
+                        {ref.referencia}
+                      </option>
+                    ))}
+                  </select>
+                  {/* <input
                     type="text"
                     name="referencia"
                     value={formData.referencia}
@@ -246,7 +263,7 @@ export const ProductionForm = () => {
                     className={`w-full px-3 py-2 border rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 ${
                       errors.referencia ? 'border-red-300' : 'border-gray-300'
                     }`}
-                  />
+                  /> */}
                   {errors.referencia && (
                     <div className="flex items-center space-x-1 mt-1">
                       <AlertCircle className="w-4 h-4 text-red-500" />

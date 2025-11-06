@@ -2,7 +2,8 @@ import React, { createContext, useContext, useState, useEffect } from 'react';
 import { createProductionOrder, createProductionEntry } from '../types';
 import { productionOrdersAPI, handleApiError } from '../services/api';
 import { calculateWorkEndDate } from '../utils/dateUtils';
-
+import { fetchReferences } from '../services/ext/referencias';
+import { intervalToDuration } from 'date-fns'
 const ProductionContext = createContext(undefined);
 
 export const useProduction = () => {
@@ -15,18 +16,35 @@ export const useProduction = () => {
 
 export const ProductionProvider = ({ children }) => {
   const [orders, setOrders] = useState([]);
+  const [references, setReferences] = useState([])
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
   // Load data from API or localStorage on mount
   useEffect(() => {
     loadOrders();
+    if (!localStorage.getItem('references')) {
+      loadReferences();
+    } else {
+      if (!intervalToDuration({ start: new Date(JSON.parse(localStorage.getItem('references'))?.date), end: new Date() }).days > 7) {
+        loadReferences();
+      }
+    }
   }, []);
 
-  // Save to localStorage whenever orders change (fallback)
-  /* useEffect(() => {
-    localStorage.setItem('productionOrders', JSON.stringify(orders));
-  }, [orders]); */
+  const loadReferences = async () => {
+    try {
+      const references = await fetchReferences();
+      const pkg = {
+        data : references,
+        date : new Date().toISOString()
+      }
+      localStorage.setItem('references', JSON.stringify(pkg));
+    } catch (error) {
+      setError(handleApiError(error));
+      throw error;
+    }
+  }
 
   const loadOrders = async () => {
     setLoading(true);
