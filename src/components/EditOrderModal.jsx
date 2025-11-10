@@ -16,7 +16,7 @@ export const EditOrderModal = ({ isOpen, onClose, onSubmit, order, loading }) =>
   });
   
   const [errors, setErrors] = useState({});
-  const references = JSON.parse(localStorage.getItem('references')).data.sort((a, b) => a.modulo - b.modulo) || [];
+  const references = JSON.parse(localStorage.getItem('references'))?.data.sort((a, b) => a.modulo - b.modulo) || [];
 
   useEffect(() => {
     if (order && isOpen) {
