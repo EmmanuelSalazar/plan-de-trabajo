@@ -254,16 +254,6 @@ export const ProductionForm = () => {
                       </option>
                     ))}
                   </select>
-                  {/* <input
-                    type="text"
-                    name="referencia"
-                    value={formData.referencia}
-                    onChange={handleInputChange}
-                    placeholder="ej: REF-001"
-                    className={`w-full px-3 py-2 border rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 ${
-                      errors.referencia ? 'border-red-300' : 'border-gray-300'
-                    }`}
-                  /> */}
                   {errors.referencia && (
                     <div className="flex items-center space-x-1 mt-1">
                       <AlertCircle className="w-4 h-4 text-red-500" />

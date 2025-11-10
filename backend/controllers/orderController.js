@@ -574,7 +574,7 @@ const getOrdersInProduction = async (req, res) => {
       where: {
         enProduccion: true
       },
-      attributes: ['ordenProduccion', 'referencia', 'modulo', 'unidadesProducidas', 'cantidadEntrada', 'promedioProduccion']
+      attributes: ['ordenProduccion', 'referencia', 'modulo', 'unidadesProducidas', 'cantidadEntrada', 'promedioProduccion', 'ref_id']
     });
 
     res.json(orders);

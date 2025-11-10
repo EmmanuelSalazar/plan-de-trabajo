@@ -6,6 +6,7 @@ export const EditOrderModal = ({ isOpen, onClose, onSubmit, order, loading }) =>
     fechaEntrada: '',
     ordenProduccion: '',
     referencia: '',
+    ref_id: '',
     color: '',
     promedioProduccion: '',
     cantidadEntrada: '',
@@ -15,6 +16,7 @@ export const EditOrderModal = ({ isOpen, onClose, onSubmit, order, loading }) =>
   });
   
   const [errors, setErrors] = useState({});
+  const references = JSON.parse(localStorage.getItem('references')).data.sort((a, b) => a.modulo - b.modulo) || [];
 
   useEffect(() => {
     if (order && isOpen) {
@@ -22,6 +24,7 @@ export const EditOrderModal = ({ isOpen, onClose, onSubmit, order, loading }) =>
         fechaEntrada: order.fechaEntrada || '',
         ordenProduccion: order.ordenProduccion || '',
         referencia: order.referencia || '',
+        ref_id: references?.find(ref => ref.referencia === formData.referencia)?.ref_id || '',
         color: order.color || '',
         promedioProduccion: order.promedioProduccion?.toString() || '',
         cantidadEntrada: order.cantidadEntrada?.toString() || '',
@@ -90,6 +93,7 @@ export const EditOrderModal = ({ isOpen, onClose, onSubmit, order, loading }) =>
       fechaEntrada: formData.fechaEntrada,
       ordenProduccion: formData.ordenProduccion,
       referencia: formData.referencia,
+      ref_id: formData.ref_id,
       color: formData.color,
       promedioProduccion: Number(formData.promedioProduccion),
       cantidadEntrada: Number(formData.cantidadEntrada),
@@ -184,16 +188,20 @@ export const EditOrderModal = ({ isOpen, onClose, onSubmit, order, loading }) =>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
                   Referencia
                 </label>
-                <input
-                  type="text"
-                  name="referencia"
-                  value={formData.referencia}
-                  onChange={handleInputChange}
-                  placeholder="ej: REF-001"
-                  className={`w-full px-3 py-2 border rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 ${
-                    errors.referencia ? 'border-red-300' : 'border-gray-300'
-                  }`}
-                />
+                <select
+                    name="referencia"
+                    value={formData.referencia}
+                    onChange={handleInputChange}
+                    className={`w-full px-3 py-2 border rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 ${
+                      errors.referencia ? 'border-red-300' : 'border-gray-300'
+                    }`}
+                  >
+                    {references?.map((ref) => (
+                      <option key={ref.ref_id} value={ref.referencia}>
+                        {ref.referencia}
+                      </option>
+                    ))}
+                  </select>
                 {errors.referencia && (
                   <div className="flex items-center space-x-1 mt-1">
                     <AlertCircle className="w-4 h-4 text-red-500" />
