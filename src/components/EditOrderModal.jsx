@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { X, Save, AlertCircle, Loader2 } from 'lucide-react';
-
+import { useProduction } from '../context/ProductionContext';
 export const EditOrderModal = ({ isOpen, onClose, onSubmit, order, loading }) => {
   const [formData, setFormData] = useState({
     fechaEntrada: '',
@@ -14,10 +14,8 @@ export const EditOrderModal = ({ isOpen, onClose, onSubmit, order, loading }) =>
     materialesEnBodega: false,
     enProduccion: false,
   });
-  
+  const { references } = useProduction();
   const [errors, setErrors] = useState({});
-  const references = JSON.parse(localStorage.getItem('references'))?.data.sort((a, b) => a.modulo - b.modulo) || [];
-
   useEffect(() => {
     if (order && isOpen) {
       setFormData({

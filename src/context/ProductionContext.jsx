@@ -23,23 +23,25 @@ export const ProductionProvider = ({ children }) => {
   // Load data from API or localStorage on mount
   useEffect(() => {
     loadOrders();
-    if (!localStorage.getItem('references')) {
+    loadReferences();
+    /* if (!localStorage.getItem('references')) {
       loadReferences();
     } else {
       if (!intervalToDuration({ start: new Date(JSON.parse(localStorage.getItem('references'))?.date), end: new Date() }).days > 7) {
         loadReferences();
       }
-    }
+    } */
   }, []);
 
   const loadReferences = async () => {
     try {
       const references = await fetchReferences();
-      const pkg = {
+      setReferences(references)
+      /* const pkg = {
         data : references,
         date : new Date().toISOString()
       }
-      localStorage.setItem('references', JSON.stringify(pkg));
+      localStorage.setItem('references', JSON.stringify(pkg)); */
     } catch (error) {
       setError(handleApiError(error));
       throw error;
@@ -196,6 +198,7 @@ export const ProductionProvider = ({ children }) => {
       deleteProductionEntry,
       searchBar,
       updateOrder,
+      references
     }}>
       {children}
     </ProductionContext.Provider>

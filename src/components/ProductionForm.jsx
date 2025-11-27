@@ -5,9 +5,9 @@ import { Save, AlertCircle, Loader2, Plus, X } from 'lucide-react';
 
 export const ProductionForm = () => {
   const navigate = useNavigate();
-  const { addOrder, loading, error } = useProduction();
-  const references = JSON.parse(localStorage.getItem('references'))?.data;
-  console.log(references)
+  const { addOrder, loading, error, references } = useProduction();
+/*   const references = JSON.parse(localStorage.getItem('references'))?.data;
+ */  console.log(references)
   const [formData, setFormData] = useState({
     fechaEntrada: '',
     ordenProduccion: '',
