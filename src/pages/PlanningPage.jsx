@@ -62,15 +62,23 @@ export const PlanningPage = () => {
       const startDate = new Date(currentStartDate);
       const endDate = calculateWorkEndDate(startDate, workDays);
       
-      // Next order starts the day after this one ends
-      currentStartDate = new Date(endDate);
-      currentStartDate.setDate(currentStartDate.getDate() + 1);
+      // Si la orden actual requiere 0.3 días o menos, la siguiente orden puede comenzar el mismo día
+      if (workDays <= 0.3) {
+        // La siguiente orden comienza el mismo día
+        currentStartDate = new Date(startDate);
+      } else {
+        // La siguiente orden comienza el día después de que termine esta
+        currentStartDate = new Date(endDate);
+        currentStartDate.setDate(currentStartDate.getDate() + 1);
+      }
       
       totalDays += workDays;
       
       /* console.log(`📅 [PLANNING] Orden ${order.ordenProduccion}:`, {
         remaining,
         workDays,
+        workDaysFormatted: workDays.toFixed(2),
+        startsNextDay: workDays > 0.3,
         startDate: startDate.toLocaleDateString(),
         endDate: endDate.toLocaleDateString()
       }); */
@@ -88,6 +96,7 @@ export const PlanningPage = () => {
     /* console.log('📊 [PLANNING] Timeline calculado:', {
       totalOrders: ordersWithDates.length,
       totalDays,
+      totalDaysFormatted: totalDays.toFixed(2),
       finalEndDate: ordersWithDates[ordersWithDates.length - 1]?.plannedEndDate
     }); */
 
@@ -122,8 +131,16 @@ export const PlanningPage = () => {
       const startDate = new Date(currentStartDate);
       const endDate = calculateWorkEndDate(startDate, workDays);
       
-      currentStartDate = new Date(endDate);
-      currentStartDate.setDate(currentStartDate.getDate() + 1);
+      // Aplicar la misma lógica para el drag and drop
+      const exactWorkDays = remaining / order.promedioProduccion;
+      if (exactWorkDays <= 0.3) {
+        // La siguiente orden comienza el mismo día
+        currentStartDate = new Date(startDate);
+      } else {
+        // La siguiente orden comienza el día después de que termine esta
+        currentStartDate = new Date(endDate);
+        currentStartDate.setDate(currentStartDate.getDate() + 1);
+      }
       
       totalDays += workDays;
       
@@ -356,7 +373,12 @@ export const PlanningPage = () => {
                                   </div>
                                   <div className="text-right">
                                     <p className="text-sm font-medium text-gray-900">Módulo {order.modulo}</p>
-                                    <p className="text-xs text-gray-500">{order.workDays} días laborales</p>
+                                    <p className="text-xs text-gray-500">
+                                      {(order.remaining / order.promedioProduccion).toFixed(2)} días laborales
+                                      {(order.remaining / order.promedioProduccion) <= 0.3 && (
+                                        <span className="ml-1 text-blue-600">⚡</span>
+                                      )}
+                                    </p>
                                   </div>
                                 </div>
 

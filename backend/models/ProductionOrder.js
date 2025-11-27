@@ -22,6 +22,10 @@ const ProductionOrder = sequelize.define('production_orders', {
     type: DataTypes.STRING(100),
     allowNull: false
   },
+  ref_id: {
+    type: DataTypes.INTEGER,
+    allowNull: true
+  },
   color: {
     type: DataTypes.STRING(50),
     allowNull: false
