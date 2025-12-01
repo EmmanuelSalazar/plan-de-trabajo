@@ -362,7 +362,7 @@ const updateOrder = async (req, res) => {
       console.log(`⚠️ Desactivando otras órdenes en Módulo ${moduloToUpdate}...`);
       
       // 3. Desactivar todas las demás órdenes en producción para ese módulo
-      await ProductionOrder.update(
+     /*  await ProductionOrder.update(
         { enProduccion: false },
         {
           where: { 
@@ -373,7 +373,7 @@ const updateOrder = async (req, res) => {
           transaction: t
         }
       );
-      console.log('✅ Desactivación de órdenes previas completada.');
+      console.log('✅ Desactivación de órdenes previas completada.'); */
     }
     // 🌟 FIN LÓGICA DE NEGOCIO 🌟
 
