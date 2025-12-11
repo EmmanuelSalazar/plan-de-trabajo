@@ -35,7 +35,16 @@ app.use(cors(corsOptions));
 // Middleware para parsing JSON
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true, limit: '10mb' }));
+// Este middleware DEBE ir DESPUÉS de app.use(express.json())
+app.use((req, res, next) => {
+    if (req.method === 'PUT' && req.path.includes('/api/orders/74')) {
+        console.log('🐞 [DEBUG PUT 74] Body RAW:', req.body);
+        console.log('🐞 [DEBUG PUT 74] Tipo de ref_id:', typeof req.body.ref_id);
+    }
+    next();
+});
 
+// Nota: Asegúrate de volver a compilar/desplegar esto en producción.
 // Middleware de logging
 app.use((req, res, next) => {
   console.log(`${new Date().toISOString()} - ${req.method} ${req.path}`);
